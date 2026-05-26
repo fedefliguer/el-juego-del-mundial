@@ -525,13 +525,13 @@ function renderSummary() {
   html += '</div>';
 
   if (state.answers.dobleCamiseta.team) {
-    html += '<div class="summary-block"><h4>Doble Camiseta</h4>';
+    html += '<div class="summary-block"><h4>La primera vez</h4>';
     html += `<span class="summary-item">${escapeHtml(state.answers.dobleCamiseta.team)} — ${state.answers.dobleCamiseta.mode === 'solo' ? 'Único debutante' : 'Compartido'}</span></div>`;
   }
 
   const f = state.answers.final;
   if (f.team1 && f.team2) {
-    html += '<div class="summary-block"><h4>La Final</h4>';
+    html += '<div class="summary-block"><h4>Final y campeón</h4>';
     html += `<span class="summary-item">${escapeHtml(f.team1)} ${f.score1}-${f.score2} ${escapeHtml(f.team2)}`;
     if (f.champion) html += ` — Campeón: ${f.champion === '1' ? escapeHtml(f.team1) : escapeHtml(f.team2)}`;
     html += '</span></div>';

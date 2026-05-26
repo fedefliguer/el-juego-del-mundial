@@ -102,7 +102,7 @@ function renderTable(data, allTags, view) {
 
   html += `<div class="ranking-table-wrap">
       <table class="ranking-table">
-        <thead><tr><th>#</th><th>Nombre</th><th>Puntos</th><th title="Grupos">G</th><th title="Campeones">C</th><th title="No campeones">NC</th><th title="Argentina">AR</th><th title="Doble Camiseta">DC</th><th title="Final">F</th><th title="Goleador">GL</th></tr></thead>
+        <thead><tr><th>#</th><th>Nombre</th><th>Puntos</th><th title="Grupos">G</th><th title="Campeones">C</th><th title="No campeones">NC</th><th title="Argentina">AR</th><th title="La primera vez">1ª</th><th title="Final">F</th><th title="Goleador">GL</th></tr></thead>
         <tbody>`;
 
   page.forEach((d, i) => {
@@ -227,12 +227,12 @@ function renderPredictionDetail(name, tags, answers) {
   html += '</div>';
 
   if (a.dobleCamiseta?.team) {
-    html += '<div class="detail-block"><h4>Doble Camiseta</h4>';
+    html += '<div class="detail-block"><h4>La primera vez</h4>';
     html += `<span class="detail-item">${escapeHtml(a.dobleCamiseta.team)} — ${a.dobleCamiseta.mode === 'solo' ? 'Único debutante' : 'Compartido'}</span></div>`;
   }
 
   if (a.final?.team1 && a.final?.team2) {
-    html += '<div class="detail-block"><h4>La Final</h4>';
+    html += '<div class="detail-block"><h4>Final y campeón</h4>';
     const f = a.final;
     html += `<span class="detail-item">${escapeHtml(f.team1)} ${f.score1}-${f.score2} ${escapeHtml(f.team2)}`;
     if (f.champion) html += ` — Campeón: ${f.champion === '1' ? escapeHtml(f.team1) : escapeHtml(f.team2)}`;

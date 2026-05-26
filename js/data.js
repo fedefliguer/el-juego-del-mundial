@@ -115,7 +115,7 @@ const ARG_STAGES = [
 // ---------- NOMBRES CORTOS PARA PASOS ----------
 const STEP_NAMES = [
   'Grupos', 'Campeones', 'Otros', 'Argentina',
-  'Doble C.', 'Final', 'Goleador'
+  '1ª vez', 'Final y c.', 'Goleador'
 ];
 
 // ---------- DEFINICIÓN DE PASOS DEL FORMULARIO ----------
@@ -123,44 +123,44 @@ const STEPS = [
   {
     id: 'groups',
     title: 'Fase de Grupos',
-    desc: 'Elegí 1° y 2° de cada grupo. Sumás 150 por grupo si acertás en orden y 50 si ambos pasan pero en desorden.',
+    desc: 'Elegí 1° y 2° de cada grupo. Sumás 150 por grupo si acertás en orden y 50 si ambos pasan de ronda pero no en ese orden.',
     type: 'groups',
     groups: ['A','B','C','D','E','F','G','H','I','J','K','L']
   },
   {
     id: 'champions',
-    title: 'Los 7 que saben cuánto pesa',
+    title: 'Los 7 países que saben cuánto pesa',
     desc: 'Elegí cuándo se vuelven. Sumás 300 por cada uno, salvo que aciertes que se vuelve en grupos que sumás 500.',
     type: 'champions'
   },
   {
     id: 'non_champions',
-    title: 'El resto del mundo',
-    desc: 'Elegí 3 equipos y acertá cuándo se vuelven. Cuanto más lejos elegís que llega, más sumás si acertás.',
+    title: 'Los 41 restantes',
+    desc: 'Elegí 3 países y acertá cuándo se vuelven. Cuanto más lejos elegís que llega, más sumás si acertás.',
     type: 'non_champions'
   },
   {
     id: 'argentina',
     title: 'El Camino de Argentina',
-    desc: 'Elegí en qué puesto quedamos y contra quién vamos en cada ronda. Por cada acierto sumás 300. Si te equivocás perdés todo. Podés plantarte.',
+    desc: 'Elegí en qué puesto del grupo quedamos y contra quién vamos en cada ronda. Por cada acierto sumás 300. Si te equivocás perdés todo. Podés plantarte y sumar 300 por cada acierto previo.',
     type: 'argentina'
   },
   {
     id: 'doble_camiseta',
-    title: 'Doble Camiseta',
+    title: 'La primera vez',
     desc: 'Elegí el debutante que llega más lejos. Si acertás compartido son 400. Si le ponés "único" y acertás, son 1000.',
     type: 'doble_camiseta'
   },
   {
     id: 'final',
-    title: 'La Final',
-    desc: 'Elegí los dos equipos que la juegan, el resultado y el campeón. Acertar los dos finalistas son 500, el resultado 300 y el campeón 2500.',
+    title: 'Final y campeón',
+    desc: 'Elegí los dos equipos que la juegan, el resultado y el campeón. Por cada finalista que acertás sumás 500. Si acertás el resultado del partido (más alargue si hay) sumás 300. Si acertás el campeón sumás 2500.',
     type: 'final'
   },
   {
     id: 'goleador',
     title: 'Goleador',
-    desc: 'Elegí al que más goles hace. Acertar el jugador son 400, los goles 100 y ambas 1000.',
+    desc: 'Elegí al que más goles hace y cuántos. Si acertás el jugador (u "otros") sumás 400. Si acertás el número de goles sumás 100. Si acertás ambos sumás 1000 en total. Si hay más de un goleador suman todos, incluso "otros" llegado el caso.',
     type: 'goleador'
   }
 ];
