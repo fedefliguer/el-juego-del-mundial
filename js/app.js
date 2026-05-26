@@ -163,6 +163,23 @@ function clearStep() {
   renderCurrentStep();
 }
 
+function resetAll() {
+  state.answers = {
+    groups: {},
+    champions: {},
+    nonChamps: [{ team: '', stage: '' }, { team: '', stage: '' }, { team: '', stage: '' }],
+    argentina: { grupo: '', rivales: {}, plantarse: null },
+    dobleCamiseta: { team: '', mode: '' },
+    final: { team1: '', team2: '', score1: '0', score2: '0', champion: '' },
+    goleador: { player: '', goals: '' }
+  };
+  state.tags = [];
+  state.fantasyName = '';
+  state.step = 0;
+  try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
+  showScreen('landing');
+}
+
 /* ---------- RANDOM FILL ---------- */
 function fillStepRandom() {
   const step = STEPS[state.step];
@@ -216,7 +233,7 @@ function renderCurrentStep() {
   const total = STEPS.length;
   const comp = STEPS.filter((_, i) => isStepComplete(i)).length;
 
-  stepCounter.textContent = `Paso ${state.step + 1} de ${total} — ${STEP_NAMES[state.step]}  ·  ${comp}/${total}`;
+  stepCounter.textContent = `Paso ${state.step + 1} de 7 — ${STEP_NAMES[state.step]}`;
   progressFill.style.width = `${(comp / total) * 100}%`;
   renderStepDots();
 
@@ -236,8 +253,11 @@ function renderCurrentStep() {
     <div class="step-scroll">
       ${header}${body}
       <div class="step-actions">
-        <button class="btn btn--ghost btn--action" id="btn-clear">🗑️ Borrar todo</button>
+        <button class="btn btn--ghost btn--action" id="btn-clear">🗑️ Borrar paso</button>
         <button class="btn btn--ghost btn--action" id="btn-random">🎲 Aleatorio</button>
+      </div>
+      <div class="step-actions" style="margin-top:6px;">
+        <button class="btn btn--ghost btn--action" id="btn-reset" style="color:var(--danger);border-color:var(--danger)!important;">🗑️ Eliminar todo y empezar de nuevo</button>
       </div>
     </div>`;
 
@@ -248,6 +268,8 @@ function renderCurrentStep() {
 
   $('btn-clear').addEventListener('click', clearStep);
   $('btn-random').addEventListener('click', fillStepRandom);
+  const resetBtn = $('btn-reset');
+  if (resetBtn) resetBtn.addEventListener('click', resetAll);
 
   btnBack.style.visibility = state.step === 0 ? 'hidden' : 'visible';
 }
