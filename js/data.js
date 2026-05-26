@@ -123,7 +123,7 @@ const STEPS = [
   {
     id: 'groups',
     title: 'Fase de Grupos',
-    desc: 'Elegí 1° y 2° de cada grupo. Sumás 150 por grupo si acertás en orden. Sumás 50 si ambos pasan los grupos pero no en ese orden.',
+    desc: 'Elegí 1° y 2° de los 12 grupos. Sumás 150 por grupo si acertás en orden. Sumás 50 si ambos pasan los grupos pero no en ese orden.',
     type: 'groups',
     groups: ['A','B','C','D','E','F','G','H','I','J','K','L']
   },
@@ -154,7 +154,7 @@ const STEPS = [
   {
     id: 'final',
     title: 'Final y campeón',
-    desc: 'Elegí los dos países que la juegan, el resultado y el campeón. Por cada finalista que acertás sumás 500. Si acertás el resultado del partido (más eventual alargue) sumás 300. Si acertás el campeón sumás 2500.',
+    desc: 'Elegí los dos equipos que la juegan, el resultado y el campeón. Por cada finalista que acertás sumás 500. Si acertás el resultado del partido (más eventual alargue) sumás 300. Si acertás el campeón sumás 2500.',
     type: 'final'
   },
   {
