@@ -846,28 +846,6 @@ function prevStep() {
   goToStep(state.step - 1);
 }
 
-/* ---------- SHARE ---------- */
-function renderShareSection() {
-  const el = $('done-share');
-  if (!el) return;
-  const tag = state.tags[0] || '';
-  const url = tag
-    ? `${window.location.origin}${window.location.pathname}?tag=${encodeURIComponent(tag)}`
-    : window.location.href.split('?')[0];
-  const msg = tag
-    ? `¡Ya cargué mis predicciones para el Mundial 2026 🏆! Unite a mi torneo "${tag}" y vamos a ver quién gana 👇`
-    : `¡Ya cargué mis predicciones para el Mundial 2026 🏆! ¿Te animás a ganarme? 👇`;
-
-  el.innerHTML = `
-    <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">
-      Compartí con tus amigos para armarlo picante 👇
-    </p>
-    <div class="share-box">
-      <input type="text" id="share-text" readonly value="${escapeHtml(msg)} ${escapeHtml(url)}" style="font-size:0.8rem;">
-      <button class="btn btn--primary" id="btn-share" style="white-space:nowrap;padding:10px 16px;font-size:0.85rem;">📤 Compartir</button>
-    </div>`;
-}
-
 /* ---------- SUBMIT ---------- */
 async function handleSubmit() {
   if (!validateFinal()) return;
@@ -879,7 +857,6 @@ async function handleSubmit() {
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
     showScreen('done');
     $('done-name').textContent = `Registrado como "${state.fantasyName}".`;
-    renderShareSection();
   } catch (err) {
     if (err.message === 'duplicate_name') {
       showToast('❌ Ese nombre ya fue tomado. Elegí otro.');
