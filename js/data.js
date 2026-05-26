@@ -123,44 +123,44 @@ const STEPS = [
   {
     id: 'groups',
     title: 'Fase de Grupos',
-    desc: 'Elegí 1° y 2° de cada grupo. Sumás 150 si acertás en orden y 50 si ambos pasan pero en desorden.',
+    desc: 'Elegí 1° y 2° de cada grupo. Sumás 150 por grupo si acertás en orden y 50 si ambos pasan pero en desorden.',
     type: 'groups',
     groups: ['A','B','C','D','E','F','G','H','I','J','K','L']
   },
   {
     id: 'champions',
     title: 'Los 7 que saben cuánto pesa',
-    desc: 'Elegí cuándo se van. Sumás 300 por cada uno, salvo que aciertes que se va en grupos que sumás 500.',
+    desc: 'Elegí cuándo se vuelven. Sumás 300 por cada uno, salvo que aciertes que se vuelve en grupos que sumás 500.',
     type: 'champions'
   },
   {
     id: 'non_champions',
     title: 'El resto del mundo',
-    desc: 'Elegí 3 equipos y acertá cuándo se van. Cuanto más lejos, más puntos.',
+    desc: 'Elegí 3 equipos y acertá cuándo se vuelven. Cuanto más lejos elegís que llega, más sumás si acertás.',
     type: 'non_champions'
   },
   {
     id: 'argentina',
-    title: '🇦🇷 El Camino de Argentina',
+    title: 'El Camino de Argentina',
     desc: 'Elegí en qué puesto quedamos y contra quién vamos en cada ronda. Por cada acierto sumás 300. Si te equivocás perdés todo. Podés plantarte.',
     type: 'argentina'
   },
   {
     id: 'doble_camiseta',
     title: 'Doble Camiseta',
-    desc: 'Elegí el debutante que llega más lejos. Si le ponés "único" y acertás, son 1000 puntos.',
+    desc: 'Elegí el debutante que llega más lejos. Si acertás compartido son 400. Si le ponés "único" y acertás, son 1000.',
     type: 'doble_camiseta'
   },
   {
     id: 'final',
     title: 'La Final',
-    desc: 'Elegí los dos equipos que la juegan, el resultado y el campeón. Acertar el campeón son 2500 puntos.',
+    desc: 'Elegí los dos equipos que la juegan, el resultado y el campeón. Acertar los dos finalistas son 500, el resultado 300 y el campeón 2500.',
     type: 'final'
   },
   {
     id: 'goleador',
     title: 'Goleador',
-    desc: 'Elegí al que más goles hace. Si acertás jugador y cantidad, son 1000 puntos.',
+    desc: 'Elegí al que más goles hace. Acertar el jugador son 400, los goles 100 y ambas 1000.',
     type: 'goleador'
   }
 ];

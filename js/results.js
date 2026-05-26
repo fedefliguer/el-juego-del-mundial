@@ -216,7 +216,7 @@ function renderPredictionDetail(name, tags, answers) {
   });
   html += '</div>';
 
-  html += '<div class="detail-block"><h4>🇦🇷 Camino de Argentina</h4>';
+  html += '<div class="detail-block"><h4>Camino de Argentina</h4>';
   if (a.argentina) {
     if (a.argentina.grupo) html += `<span class="detail-item">Grupo: ${a.argentina.grupo}°</span>`;
     argOrder.forEach(s => {

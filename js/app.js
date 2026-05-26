@@ -511,7 +511,7 @@ function renderSummary() {
   });
   html += '</div>';
 
-  html += '<div class="summary-block"><h4>🇦🇷 Camino de Argentina</h4>';
+  html += '<div class="summary-block"><h4>Camino de Argentina</h4>';
   if (state.answers.argentina.grupo) {
     html += `<span class="summary-item">Grupo: ${state.answers.argentina.grupo}°</span>`;
     order.forEach(s => {
