@@ -46,8 +46,7 @@ const state = {
     goleador: { player: '', goals: '' }
   },
   tags: [],
-  fantasyName: '',
-  captcha: null
+  fantasyName: ''
 };
 
 const $ = id => document.getElementById(id);
@@ -77,12 +76,6 @@ function showToast(msg) {
   toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
 }
 
-function generateCaptcha() {
-  const a = Math.floor(Math.random() * 10) + 1;
-  const b = Math.floor(Math.random() * 10) + 1;
-  return { question: `¿Cuánto es ${a} + ${b}?`, answer: a + b };
-}
-
 function isStepComplete(idx) {
   const step = STEPS[idx];
   const type = step.type || 'groups';
@@ -96,7 +89,14 @@ function isStepComplete(idx) {
   }
   if (type === 'champions') return CHAMPIONS.every(c => state.answers.champions[c]);
   if (type === 'non_champions') return state.answers.nonChamps.every(n => n.team && n.stage);
-  if (type === 'argentina') return !!state.answers.argentina.grupo;
+  if (type === 'argentina') {
+    const a = state.answers.argentina;
+    if (!a.grupo) return false;
+    const g = parseInt(a.grupo);
+    if (g >= 3) return true;
+    if (a.plantarse) return true;
+    return ['dieciseisavos','octavos','cuartos','semis','final'].every(s => a.rivales?.[s]);
+  }
   if (type === 'doble_camiseta') return !!(state.answers.dobleCamiseta.team && state.answers.dobleCamiseta.mode);
   if (type === 'final') {
     const f = state.answers.final;
@@ -171,7 +171,12 @@ function fillStepRandom() {
 }
 
 /* ---------- RENDER STEPS ---------- */
+let stepScrollPos = 0;
+
 function renderCurrentStep() {
+  const scrollEl = stepBody.querySelector('.step-scroll');
+  stepScrollPos = scrollEl ? scrollEl.scrollTop : 0;
+
   const step = STEPS[state.step];
   const total = STEPS.length;
   const comp = STEPS.filter((_, i) => isStepComplete(i)).length;
@@ -200,6 +205,11 @@ function renderCurrentStep() {
         <button class="btn btn--ghost btn--action" id="btn-random">🎲 Aleatorio</button>
       </div>
     </div>`;
+
+  requestAnimationFrame(() => {
+    const newScroll = stepBody.querySelector('.step-scroll');
+    if (newScroll) newScroll.scrollTop = stepScrollPos;
+  });
 
   $('btn-clear').addEventListener('click', clearStep);
   $('btn-random').addEventListener('click', fillStepRandom);
@@ -231,17 +241,27 @@ function renderGroups() {
   return html + '</div>';
 }
 
-/* --- CHAMPIONS (show prediction text when selected) --- */
+/* --- CHAMPIONS --- */
+const STAGE_PILLS = [
+  { value: 'grupos',        label: 'Grupos'   },
+  { value: 'dieciseisavos', label: '16avos'   },
+  { value: 'octavos',       label: 'Octavos'  },
+  { value: 'cuartos',       label: 'Cuartos'  },
+  { value: 'tercero',       label: '3° Puesto'},
+  { value: 'final',         label: 'Final'    },
+];
+
 function renderChampions() {
   const saved = state.answers.champions;
   let html = '<div class="champ-list">';
   CHAMPIONS.forEach(c => {
-    if (saved[c]) {
-      const label = STAGES.find(s => s.value === saved[c])?.label || saved[c];
-      html += `<div class="champ-row done"><span class="team-name">${c}</span><span class="pred-text">→ ${label}</span><button class="btn-change" data-action="champ-unset" data-team="${c}">✎</button></div>`;
-    } else {
-      html += `<div class="champ-row"><span class="team-name">${c}</span><select data-field="champions.${c}"><option value="">— Elegí —</option>${STAGES.map(s => `<option value="${s.value}">${s.label}</option>`).join('')}</select></div>`;
-    }
+    const sel = saved[c] || '';
+    html += `<div class="champ-row${sel ? ' done' : ''}">
+      <span class="team-name">${c}</span>
+      <div class="stage-pills">
+        ${STAGE_PILLS.map(s => `<button class="stage-pill${sel === s.value ? ' active' : ''}" data-action="stage-pill" data-target="champions.${c}" data-value="${s.value}">${s.label}</button>`).join('')}
+      </div>
+    </div>`;
   });
   return html + '</div>';
 }
@@ -253,21 +273,23 @@ function renderNonChampions() {
   let html = '<div class="champ-list">';
   for (let i = 0; i < 3; i++) {
     const s = saved[i] || { team: '', stage: '' };
-    if (s.team && s.stage) {
-      const stageLabel = STAGES.find(x => x.value === s.stage)?.label || s.stage;
-      html += `<div class="champ-row done"><span class="team-name">${s.team}</span><span class="pred-text">→ ${stageLabel}</span><button class="btn-change" data-action="nc-unset" data-idx="${i}">✎</button></div>`;
-    } else if (s.team && !s.stage) {
-      html += `<div class="champ-row">
-        <span class="team-name">${s.team}</span>
-        <select data-field="nonChamps.${i}.stage"><option value="">— Techo —</option>${STAGES.map(sg => `<option value="${sg.value}">${sg.label}</option>`).join('')}</select>
+    if (s.team) {
+      html += `<div class="champ-row${s.stage ? ' done' : ''}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span class="team-name">${s.team}</span>
+          <button class="btn-change" data-action="nc-unset" data-idx="${i}">✎</button>
+        </div>
+        <div class="stage-pills">
+          ${STAGE_PILLS.map(sg => `<button class="stage-pill${s.stage === sg.value ? ' active' : ''}" data-action="stage-pill" data-target="nonChamps.${i}.stage" data-value="${sg.value}">${sg.label}</button>`).join('')}
+        </div>
       </div>`;
     } else {
       html += `<div class="champ-row">
-        <select data-field="nonChamps.${i}.team"><option value="">Equipo #${i+1}</option>${nt.map(t => `<option value="${t}" ${s.team === t ? 'selected' : ''}>${t}</option>`).join('')}</select>
+        <select data-field="nonChamps.${i}.team"><option value="">Equipo #${i+1}</option>${nt.map(t => `<option value="${t}">${t}</option>`).join('')}</select>
       </div>`;
     }
   }
-  return html + '</div><p class="help-text">Se puede apostar más de una vez al mismo equipo.</p>';
+  return html + '</div><p class="help-text" style="margin-top:8px;">Se puede apostar más de una vez al mismo equipo.</p>';
 }
 
 /* --- ARGENTINA PATH --- */
@@ -312,39 +334,94 @@ function renderArgentina() {
 function renderDobleCamiseta() {
   const dc = state.answers.dobleCamiseta;
   return `
-    <div class="form-group"><label>Equipo debutante que llegará más lejos</label>
-      <select data-field="dobleCamiseta.team"><option value="">— Elegí —</option>${DEBUTANTS.map(t => `<option value="${t}" ${dc.team === t ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
-    <div class="form-group"><label>Modalidad</label>
-      <select data-field="dobleCamiseta.mode"><option value="">— Elegí —</option>
-        <option value="solo" ${dc.mode === 'solo' ? 'selected' : ''}>Único debutante en esa fase</option>
-        <option value="compartido" ${dc.mode === 'compartido' ? 'selected' : ''}>Comparte con otro(s)</option></select></div>`;
+    <div class="form-group">
+      <label>Equipo debutante que llegará más lejos</label>
+      <div class="choice-grid">
+        ${DEBUTANTS.map(t => `<button class="choice-card${dc.team === t ? ' active' : ''}" data-action="dc-team" data-team="${t}">${t}</button>`).join('')}
+      </div>
+    </div>
+    <div class="form-group">
+      <label>¿Llegará solo o junto a otro debutante?</label>
+      <div class="choice-grid choice-grid--2">
+        <button class="choice-card choice-card--desc${dc.mode === 'solo' ? ' active' : ''}" data-action="dc-mode" data-mode="solo">
+          <strong>Único</strong>
+          <span>El único debutante en esa fase</span>
+        </button>
+        <button class="choice-card choice-card--desc${dc.mode === 'compartido' ? ' active' : ''}" data-action="dc-mode" data-mode="compartido">
+          <strong>Compartido</strong>
+          <span>Llega con otro(s) debutante(s)</span>
+        </button>
+      </div>
+    </div>`;
 }
 
 /* --- FINAL --- */
 function renderFinal() {
   const f = state.answers.final;
   const both = f.team1 && f.team2 && f.team1 !== f.team2;
-  return `<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:end;">
-    <div class="form-group"><label>Finalista A</label><select data-field="final.team1"><option value="">— Elegí —</option>${TEAMS.map(t => `<option value="${t}" ${f.team1 === t ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
-    <div style="text-align:center;padding-bottom:12px;font-weight:700;color:var(--text-muted);font-size:1.2rem;">vs</div>
-    <div class="form-group"><label>Finalista B</label><select data-field="final.team2"><option value="">— Elegí —</option>${TEAMS.map(t => `<option value="${t}" ${f.team2 === t ? 'selected' : ''}>${t}</option>`).join('')}</select></div></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-      <div class="form-group"><label>Goles ${f.team1 || 'A'}</label><input type="number" data-field="final.score1" min="0" max="15" placeholder="0" value="${f.score1}"></div>
-      <div class="form-group"><label>Goles ${f.team2 || 'B'}</label><input type="number" data-field="final.score2" min="0" max="15" placeholder="0" value="${f.score2}"></div></div>
-    <div class="form-group" style="border-top:2px solid var(--border);padding-top:16px;margin-top:8px;">
-      <label>🏆 Campeón</label>
-      ${both ? `<select data-field="final.champion"><option value="">— Elegí —</option><option value="1" ${f.champion === '1' ? 'selected' : ''}>${f.team1}</option><option value="2" ${f.champion === '2' ? 'selected' : ''}>${f.team2}</option></select>`
-      : `<p class="help-text">Primero elegí los dos finalistas.</p>`}
+  const s1 = f.score1 !== '' ? parseInt(f.score1) : 0;
+  const s2 = f.score2 !== '' ? parseInt(f.score2) : 0;
+  return `
+    <div class="finalists-row">
+      <div class="form-group" style="margin:0;flex:1">
+        <label>Finalista A</label>
+        <select data-field="final.team1"><option value="">— Elegí —</option>${TEAMS.map(t => `<option value="${t}" ${f.team1 === t ? 'selected' : ''}>${t}</option>`).join('')}</select>
+      </div>
+      <div class="vs-badge">vs</div>
+      <div class="form-group" style="margin:0;flex:1">
+        <label>Finalista B</label>
+        <select data-field="final.team2"><option value="">— Elegí —</option>${TEAMS.map(t => `<option value="${t}" ${f.team2 === t ? 'selected' : ''}>${t}</option>`).join('')}</select>
+      </div>
+    </div>
+
+    <div class="score-row">
+      <div class="score-label" style="grid-column:1/-1;margin-bottom:4px;">Resultado 90' (o 120')</div>
+      <div class="score-group">
+        <div class="score-stepper">
+          <button class="stepper-btn" data-action="score-step" data-field="score1" data-dir="dec">−</button>
+          <span class="stepper-val">${s1}</span>
+          <button class="stepper-btn" data-action="score-step" data-field="score1" data-dir="inc">+</button>
+        </div>
+      </div>
+      <div class="score-divider">—</div>
+      <div class="score-group">
+        <div class="score-stepper">
+          <button class="stepper-btn" data-action="score-step" data-field="score2" data-dir="dec">−</button>
+          <span class="stepper-val">${s2}</span>
+          <button class="stepper-btn" data-action="score-step" data-field="score2" data-dir="inc">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group" style="border-top:2px solid var(--border);padding-top:16px;margin-top:4px;">
+      <label>Campeón</label>
+      ${both
+        ? `<div class="choice-grid choice-grid--2">
+            <button class="choice-card${f.champion === '1' ? ' active' : ''}" data-action="set-champion" data-val="1">${f.team1}</button>
+            <button class="choice-card${f.champion === '2' ? ' active' : ''}" data-action="set-champion" data-val="2">${f.team2}</button>
+          </div>`
+        : `<p class="help-text">Primero elegí los dos finalistas.</p>`}
     </div>`;
 }
 
 /* --- GOLEADOR --- */
 function renderGoleador() {
   const g = state.answers.goleador;
-  return `<div class="form-group"><label>Jugador</label>
-    <select data-field="goleador.player"><option value="">— Elegí —</option>${PLAYERS.map(p => `<option value="${p}" ${g.player === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>
-    <div class="form-group"><label>Goles</label><input type="number" data-field="goleador.goals" min="0" max="30" placeholder="Ej: 8" value="${g.goals}"></div>
-    <p class="help-text">"Otro" comparte puntos si hay empate de goleada.</p>`;
+  const goals = g.goals !== '' ? parseInt(g.goals) : 0;
+  return `
+    <div class="form-group">
+      <label>Jugador</label>
+      <select data-field="goleador.player"><option value="">— Elegí —</option>${PLAYERS.map(p => `<option value="${p}" ${g.player === p ? 'selected' : ''}>${p}</option>`).join('')}</select>
+      <p class="help-text" style="margin-top:6px;">"Otro" comparte puntos si hay empate de goleada.</p>
+    </div>
+    <div class="form-group">
+      <label>Cantidad de goles</label>
+      <div class="score-stepper" style="justify-content:flex-start;gap:16px;">
+        <button class="stepper-btn" data-action="score-step" data-field="goals-player" data-dir="dec">−</button>
+        <span class="stepper-val">${goals}</span>
+        <button class="stepper-btn" data-action="score-step" data-field="goals-player" data-dir="inc">+</button>
+      </div>
+    </div>`;
 }
 
 /* ---------- TAGS ---------- */
@@ -439,38 +516,32 @@ let allExistingTags = [];
 let tagAutocompleteTimer = null;
 
 function renderFinalScreen() {
-  const captcha = generateCaptcha();
-  state.captcha = captcha;
   const body = $('final-body');
 
   body.innerHTML = `<h2>Revisá y confirmá</h2>
     <div class="final-section">
-      <details open class="summary-details">
-        <summary>Ver tus predicciones</summary>
+      <details class="summary-details">
+        <summary>📋 Ver todas tus predicciones</summary>
         ${renderSummary()}
       </details>
     </div>
-    <div class="final-section"><h3>Nombre de fantasía</h3>
+    <div class="final-section"><h3>🏷️ Nombre de fantasía</h3>
       <input type="text" id="ff-name" placeholder="Ej: MessiFan2014" maxlength="30" value="${escapeHtml(state.fantasyName)}">
       <div id="ff-name-status" class="help-text">Debe ser único. Se valida al enviar.</div></div>
-    <div class="final-section"><h3>Tags (máx. 5)</h3>
-      <p class="help-text">Los tags te permiten ver el ranking por torneo. Escribí y elegí uno existente o creá uno nuevo.</p>
+    <div class="final-section"><h3>🔖 Tags (máx. 5)</h3>
+      <p class="help-text">Los tags te permiten filtrar torneos entre amigos. Escribí y elegí uno existente o creá uno nuevo.</p>
       <div id="ff-tag-wrapper" class="tag-input-wrapper" style="position:relative;">
-        <input type="text" id="ff-tag-input" placeholder="Ej: amigos" maxlength="20" autocomplete="off">
+        <input type="text" id="ff-tag-input" placeholder="Ej: argentina" maxlength="20" autocomplete="off">
         <button class="btn btn--primary" id="ff-tag-add">+</button>
         <div id="ff-tag-suggestions" class="tag-suggestions"></div>
       </div>
-      <div id="ff-tags-container" class="tags-container"></div></div>
-    <div class="final-section"><h3>Verificación</h3>
-      <div class="captcha-box"><div class="question" id="captcha-q">${captcha.question}</div>
-      <input type="number" id="captcha-a" placeholder="Tu respuesta" min="0">
-      <p class="captcha-note">Respondé para confirmar que sos humano.</p></div></div>`;
+      <div id="ff-tags-container" class="tags-container"></div></div>`;
 
   renderTagsDOM();
   const nameInput = $('ff-name');
   const tagInput = $('ff-tag-input');
   const tagAdd = $('ff-tag-add');
-  const captchaInput = $('captcha-a');
+  const suggestions = $('ff-tag-suggestions');
 
   let nameCheckTimer = null;
   nameInput.addEventListener('input', () => {
@@ -502,8 +573,6 @@ function renderFinalScreen() {
   });
   tagInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addTag(); hideSuggestions(); } });
   tagAdd.addEventListener('click', () => { addTag(); hideSuggestions(); });
-  captchaInput.addEventListener('input', () => { validateFinal(); updateSubmitButton(); });
-
   // Load existing tags for autocomplete
   supabase.getTags().then(tags => { allExistingTags = tags; });
 
@@ -556,7 +625,7 @@ function hideSuggestions() {
 
 /* ---------- VALIDATION ---------- */
 function validateStep() { btnNext.disabled = !isStepComplete(state.step); }
-function validateFinal() { return state.fantasyName.length >= 3 && parseInt(($('captcha-a')||{}).value||'') === state.captcha?.answer; }
+function validateFinal() { return state.fantasyName.length >= 3; }
 function updateSubmitButton() { const b = $('btn-submit'); b && (b.disabled = !validateFinal()); }
 
 /* ---------- HANDLERS ---------- */
@@ -649,6 +718,46 @@ function handleAction(target) {
     state.answers.argentina.plantarse = null;
     renderCurrentStep();
   }
+
+  if (act === 'stage-pill') {
+    const parts = target.dataset.target.split('.');
+    let obj = state.answers;
+    for (let i = 0; i < parts.length - 1; i++) obj = isNaN(parts[i]) ? obj[parts[i]] : obj[parseInt(parts[i])];
+    const key = parts[parts.length - 1];
+    obj[key] = obj[key] === target.dataset.value ? '' : target.dataset.value;
+    renderCurrentStep();
+  }
+
+  if (act === 'score-step') {
+    const field = target.dataset.field;
+    const dir = target.dataset.dir;
+    if (field === 'goals-player') {
+      const cur = parseInt(state.answers.goleador.goals || 0);
+      state.answers.goleador.goals = String(Math.max(0, Math.min(30, cur + (dir === 'inc' ? 1 : -1))));
+    } else {
+      const cur = parseInt(state.answers.final[field] || 0);
+      state.answers.final[field] = String(Math.max(0, Math.min(15, cur + (dir === 'inc' ? 1 : -1))));
+    }
+    renderCurrentStep();
+  }
+
+  if (act === 'dc-team') {
+    const team = target.dataset.team;
+    state.answers.dobleCamiseta.team = state.answers.dobleCamiseta.team === team ? '' : team;
+    renderCurrentStep();
+  }
+
+  if (act === 'dc-mode') {
+    const mode = target.dataset.mode;
+    state.answers.dobleCamiseta.mode = state.answers.dobleCamiseta.mode === mode ? '' : mode;
+    renderCurrentStep();
+  }
+
+  if (act === 'set-champion') {
+    const val = target.dataset.val;
+    state.answers.final.champion = state.answers.final.champion === val ? '' : val;
+    renderCurrentStep();
+  }
 }
 
 function missingSteps() {
@@ -684,6 +793,7 @@ async function handleSubmit() {
   if (!validateFinal()) return;
   const btn = $('btn-submit');
   btn.disabled = true; btn.classList.add('btn--loading');
+
   try {
     await supabase.submit({ fantasyName: state.fantasyName, tags: state.tags, answers: state.answers });
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
@@ -706,8 +816,11 @@ document.addEventListener('change', e => { if (e.target.matches('[data-field]'))
 document.addEventListener('click', e => {
   const t = e.target;
   if (t.classList.contains('step-dot') && t.dataset.step !== undefined) goToStep(parseInt(t.dataset.step));
-  if (t.dataset.action === 'group-pick') handleGroupPick(t);
-  if (t.dataset.action === 'plantar' || t.dataset.action === 'champ-unset' || t.dataset.action === 'nc-unset' || t.dataset.action === 'unplantar') handleAction(t);
+  const actionEl = t.dataset.action ? t : t.closest('[data-action]');
+  if (actionEl) {
+    if (actionEl.dataset.action === 'group-pick') handleGroupPick(actionEl);
+    else handleAction(actionEl);
+  }
   if (t.id === 'btn-start') { showScreen('form'); if (!localStorage.getItem(STORAGE_KEY)) state.step = 0; renderCurrentStep(); }
   if (t.id === 'btn-next') nextStep();
   if (t.id === 'btn-back' || t.id === 'btn-final-back') prevStep();

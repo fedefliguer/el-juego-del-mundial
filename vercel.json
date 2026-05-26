@@ -1,5 +1,8 @@
 {
+  "functions": {
+    "api/verify-turnstile.js": { "memory": 128, "maxDuration": 10 }
+  },
   "rewrites": [
-    { "source": "/((?!css/|js/|sql/|\\.).*)", "destination": "/index.html" }
+    { "source": "/((?!api/|css/|js/|sql/|\\.).*)", "destination": "/index.html" }
   ]
 }

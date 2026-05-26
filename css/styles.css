@@ -402,23 +402,160 @@ select { cursor: pointer; appearance: auto; }
 .champ-list { display: flex; flex-direction: column; gap: 8px; }
 .champ-row {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
   background: #f8fafc;
   border-radius: var(--radius-sm);
   border: 1.5px solid var(--border);
+  transition: border-color 0.2s;
 }
-.champ-row .team-name { font-weight: 600; min-width: 90px; font-size: 0.9rem; }
-.champ-row select { flex: 1; font-size: 0.85rem; padding: 8px 10px; }
+.champ-row .team-name { font-weight: 700; font-size: 0.9rem; color: var(--text); }
+.champ-row select { font-size: 0.85rem; padding: 8px 10px; }
 .champ-row.done { border-color: var(--success); background: #f0fdf4; }
 .champ-row .pred-text { font-weight: 600; color: var(--text); font-size: 0.9rem; }
 .btn-change {
   background: none; border: 1.5px solid var(--border); border-radius: 6px;
-  cursor: pointer; font-size: 0.85rem; padding: 4px 8px; color: var(--text-muted);
-  margin-left: auto;
+  cursor: pointer; font-size: 0.8rem; padding: 3px 8px; color: var(--text-muted);
 }
 .btn-change:hover { border-color: var(--primary); color: var(--text); }
+
+/* --- Stage Pills --- */
+.stage-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+.stage-pill {
+  padding: 5px 11px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.stage-pill:hover { border-color: var(--primary); color: var(--text); }
+.stage-pill.active { background: var(--primary); border-color: var(--primary); color: #0f172a; }
+
+/* --- Choice Cards (Doble Camiseta, campeón final) --- */
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+}
+.choice-grid--2 { grid-template-columns: 1fr 1fr; }
+.choice-card {
+  padding: 14px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: #f8fafc;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text);
+  transition: all 0.18s;
+  text-align: center;
+}
+.choice-card:hover { border-color: var(--primary); background: #fffbeb; }
+.choice-card.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #0f172a;
+  box-shadow: 0 2px 8px rgba(240,180,41,0.3);
+}
+.choice-card--desc {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  padding: 14px 16px;
+}
+.choice-card--desc strong { font-size: 0.9rem; }
+.choice-card--desc span { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; font-weight: 400; }
+.choice-card--desc.active span { color: rgba(15,23,42,0.65); }
+
+/* --- Score Stepper (Final + Goleador) --- */
+.finalists-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 20px;
+}
+.vs-badge {
+  padding-bottom: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-size: 1rem;
+  text-align: center;
+}
+.score-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 20px;
+  background: #f8fafc;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+}
+.score-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.score-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  text-align: center;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.score-stepper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.stepper-btn {
+  width: 36px; height: 36px;
+  border: 1.5px solid var(--border);
+  border-radius: 50%;
+  background: #fff;
+  font-size: 1.3rem;
+  font-weight: 400;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+}
+.stepper-btn:hover { border-color: var(--primary); color: var(--text); background: #fffbeb; }
+.stepper-val {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  min-width: 44px;
+  text-align: center;
+  color: var(--text);
+  line-height: 1;
+}
+.score-divider {
+  font-size: 1.5rem;
+  color: var(--border);
+  font-weight: 300;
+  align-self: flex-end;
+  padding-bottom: 4px;
+}
 
 /* --- Argentina Path --- */
 .arg-step {
@@ -542,33 +679,6 @@ select { cursor: pointer; appearance: auto; }
 }
 .tag-input-wrapper input { flex: 1; }
 .tag-input-wrapper .btn { padding: 10px 16px; font-size: 0.9rem; }
-
-/* --- Captcha --- */
-.captcha-box {
-  background: #f8fafc;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 20px;
-  text-align: center;
-  margin-bottom: 20px;
-}
-.captcha-box .question {
-  font-size: 1.05rem;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: var(--text);
-}
-.captcha-box input {
-  max-width: 120px;
-  text-align: center;
-  margin: 0 auto;
-}
-.captcha-note {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  margin-top: 8px;
-  text-align: center;
-}
 
 /* --- Final Section --- */
 #final-body { max-height: 55vh; overflow-y: auto; padding-bottom: 8px; }

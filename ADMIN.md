@@ -14,12 +14,7 @@ No requiere build step. Es HTML/CSS/JS estático.
 
 URL del proyecto: `https://frnqrkbkwtgnurcywnkx.supabase.co`
 
-### Correr migraciones
-
-Ir a SQL Editor en Supabase y ejecutar en orden:
-
-1. `sql/schema.sql` — Tablas base
-2. `sql/migrations.sql` — Restricciones, RLS, tabla config
+Migraciones ya ejecutadas (`sql/schema.sql` + `sql/migrations.sql`).
 
 ### Tabla `config`
 
@@ -137,6 +132,5 @@ Cuando los resultados reales estén cargados en Supabase, `simulated-results.js`
 
 ## Seguridad
 
-- No hay captcha server-side. El captcha actual es decorativo.
-- No hay rate limiting server-side. Las migraciones intentan mitigarlo, pero no es infalible.
-- La `SUPABASE_ANON_KEY` está en el código fuente. Las RLS deberían ser la barrera real.
+- **Rate limiting:** Las migraciones SQL incluyen un trigger que limita a 5 inserts por IP cada 60 segundos. Ya activo.
+- La `SUPABASE_ANON_KEY` está en el código fuente. Las RLS son la barrera real.
