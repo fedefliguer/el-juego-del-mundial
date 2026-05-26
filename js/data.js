@@ -123,44 +123,44 @@ const STEPS = [
   {
     id: 'groups',
     title: 'Fase de Grupos',
-    desc: 'Elegí 1° y 2° de cada grupo',
+    desc: 'Elegí 1° y 2° de cada grupo. Sumás 150 si acertás en orden y 50 si ambos pasan pero en desorden.',
     type: 'groups',
     groups: ['A','B','C','D','E','F','G','H','I','J','K','L']
   },
   {
     id: 'champions',
-    title: 'Campeones del Mundo',
-    desc: '¿Hasta dónde llega cada campeón histórico?',
+    title: 'Los 7 que saben cuánto pesa',
+    desc: 'Elegí cuándo se van. Sumás 300 por cada uno, salvo que aciertes que se va en grupos que sumás 500.',
     type: 'champions'
   },
   {
     id: 'non_champions',
-    title: 'Otros equipos',
-    desc: 'Elegí 3 equipos no campeones y pronosticá su techo',
+    title: 'El resto del mundo',
+    desc: 'Elegí 3 equipos y acertá cuándo se van. Cuanto más lejos, más puntos.',
     type: 'non_champions'
   },
   {
     id: 'argentina',
     title: '🇦🇷 El Camino de Argentina',
-    desc: 'Pronosticá cada paso de Argentina en el torneo',
+    desc: 'Elegí en qué puesto quedamos y contra quién vamos en cada ronda. Por cada acierto sumás 300. Si te equivocás perdés todo. Podés plantarte.',
     type: 'argentina'
   },
   {
     id: 'doble_camiseta',
     title: 'Doble Camiseta',
-    desc: 'Elegí el debutante que llegará más lejos',
+    desc: 'Elegí el debutante que llega más lejos. Si le ponés "único" y acertás, son 1000 puntos.',
     type: 'doble_camiseta'
   },
   {
     id: 'final',
-    title: 'La Final del Mundial',
-    desc: '¿Quiénes la juegan, el resultado y el campeón?',
+    title: 'La Final',
+    desc: 'Elegí los dos equipos que la juegan, el resultado y el campeón. Acertar el campeón son 2500 puntos.',
     type: 'final'
   },
   {
     id: 'goleador',
-    title: 'Goleador del Torneo',
-    desc: 'Elegí al máximo goleador y sus goles',
+    title: 'Goleador',
+    desc: 'Elegí al que más goles hace. Si acertás jugador y cantidad, son 1000 puntos.',
     type: 'goleador'
   }
 ];
