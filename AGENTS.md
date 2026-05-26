@@ -23,7 +23,7 @@ Todo deployado y funcionando en https://el-juego-del-mundial.vercel.app
 - Admin manual en `ADMIN.md`
 - SQL migrations en `sql/migrations.sql` (config, RLS, rate limiting)
 
-- Server-side Turnstile captcha (Vercel function `/api/verify-turnstile.js`) — desactivado, no se usa captcha en submit
+- Server-side Turnstile captcha desactivado — no se usa captcha en submit
 
 ### Pendiente / próximos pasos
 
