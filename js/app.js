@@ -200,15 +200,12 @@ function fillStepRandom() {
 /* ---------- RENDER STEPS ---------- */
 let stepScrollPos = 0;
 
-function renderSearchableSelect(options, currentValue, field) {
+function renderSelect(options, currentValue, field, placeholder) {
   const esc = v => escapeHtml(v);
-  return `<div class="searchable-select">
-    <input type="text" class="search-filter" placeholder="Buscar..." data-field="${esc(field)}">
-    <select data-field="${esc(field)}">
-      <option value="">— Elegí —</option>
-      ${options.map(t => `<option value="${esc(t)}" ${currentValue === t ? 'selected' : ''}>${esc(t)}</option>`).join('')}
-    </select>
-  </div>`;
+  return `<select data-field="${esc(field)}">
+    <option value="">${escapeHtml(placeholder || '— Elegí —')}</option>
+    ${options.map(t => `<option value="${esc(t)}" ${currentValue === t ? 'selected' : ''}>${esc(t)}</option>`).join('')}
+  </select>`;
 }
 
 function renderCurrentStep() {
@@ -326,7 +323,7 @@ function renderNonChampions() {
       </div>`;
     } else {
       html += `<div class="champ-row">
-        ${renderSearchableSelect(nt, s.team, `nonChamps.${i}.team`)}
+        ${renderSelect(nt, s.team, `nonChamps.${i}.team`, `Equipo #${i+1}`)}
       </div>`;
     }
   }
@@ -359,7 +356,7 @@ function renderArgentina() {
       const filled = a.rivales[s];
       html += `<div class="arg-step${filled ? ' done' : ''}">
         <h4>${labels[s]}</h4>
-        ${renderSearchableSelect(na, a.rivales[s] || '', `argentina.rivales.${s}`)}
+        ${renderSelect(na, a.rivales[s] || '', `argentina.rivales.${s}`, 'Rival')}
         <button class="btn btn--ghost plant-btn" data-action="plantar" data-stage="${s}" ${filled ? 'disabled' : ''}>🛑 Plantarme acá</button>
       </div>`;
     }
@@ -403,12 +400,12 @@ function renderFinal() {
     <div class="finalists-row">
       <div class="form-group" style="margin:0;flex:1">
         <label>Finalista A</label>
-        ${renderSearchableSelect(TEAMS, f.team1, 'final.team1')}
+        ${renderSelect(TEAMS, f.team1, 'final.team1')}
       </div>
       <div class="vs-badge">vs</div>
       <div class="form-group" style="margin:0;flex:1">
         <label>Finalista B</label>
-        ${renderSearchableSelect(TEAMS, f.team2, 'final.team2')}
+        ${renderSelect(TEAMS, f.team2, 'final.team2')}
       </div>
     </div>
 
@@ -449,7 +446,7 @@ function renderGoleador() {
   return `
     <div class="form-group">
       <label>Jugador</label>
-      ${renderSearchableSelect(PLAYERS, g.player, 'goleador.player')}
+      ${renderSelect(PLAYERS, g.player, 'goleador.player')}
       <p class="help-text" style="margin-top:6px;">"Otro" comparte puntos si hay empate de goleada.</p>
     </div>
     <div class="form-group">
@@ -851,18 +848,6 @@ async function handleSubmit() {
 
 /* ---------- EVENT DELEGATION ---------- */
 document.addEventListener('change', e => { if (e.target.matches('[data-field]')) handleFieldChange(e.target); });
-
-document.addEventListener('input', e => {
-  if (e.target.classList.contains('search-filter')) {
-    const q = e.target.value.toLowerCase().trim();
-    const sel = e.target.parentElement.querySelector('select');
-    if (!sel) return;
-    sel.querySelectorAll('option').forEach(opt => {
-      if (!opt.value) { opt.style.display = ''; return; }
-      opt.style.display = opt.textContent.toLowerCase().includes(q) ? '' : 'none';
-    });
-  }
-});
 
 document.addEventListener('click', e => {
   const t = e.target;
