@@ -12,8 +12,6 @@ No requiere build step. Es HTML/CSS/JS estático.
 
 ## Base de datos (Supabase)
 
-URL del proyecto: `https://frnqrkbkwtgnurcywnkx.supabase.co`
-
 Migraciones ya ejecutadas (`sql/schema.sql` + `sql/migrations.sql`).
 
 ### Tabla `config`

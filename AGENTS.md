@@ -4,7 +4,7 @@
 
 - **Frontend:** HTML/CSS/JS puro (sin frameworks). SPA con event delegation.
 - **Hosting:** Vercel (static). Deploy con `npx vercel --prod`.
-- **Backend:** Supabase (PostgreSQL + REST API). Anon key en `js/supabase.js`.
+- **Backend:** Supabase (PostgreSQL + REST API).
 
 ## Estado actual (última sesión)
 
