@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Juego del Mundial 2026</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- TOP NAV -->
+  <nav class="top-nav">
+    <div class="nav-inner">
+      <span class="nav-brand">Mundial 2026</span>
+      <div class="nav-links">
+        <a class="nav-link active" data-screen="landing">Inicio</a>
+        <a class="nav-link" data-screen="form">Jugar</a>
+        <a class="nav-link" data-screen="results">Resultados</a>
+      </div>
+    </div>
+  </nav>
+
+  <div id="app">
+
+    <!-- INICIO / EXPLICACIÓN -->
+    <section id="s-landing" class="screen active">
+      <div class="card card--centered">
+        <div class="card-body">
+
+          <div class="landing-hero">
+            <div class="landing-badge">USA · Canadá · México · 2026</div>
+            <div class="landing-icon">🏆</div>
+            <h1>El Juego del Mundial</h1>
+            <p class="landing-sub">Cargá tus predicciones una sola vez antes del 11 de junio.<br>Después solo queda esperar y ver cómo te va.</p>
+          </div>
+
+          <div class="rules">
+            <div class="rules-grid">
+              <div class="rules-card">
+                <h4>7 categorías</h4>
+                <p>Grupos, campeones históricos, otros equipos, Argentina, debutantes, la final y goleador.</p>
+              </div>
+              <div class="rules-card">
+                <h4>Torneos entre amigos</h4>
+                <p>Usá tags para crear grupos privados. Podés ver el ranking filtrado por torneo.</p>
+              </div>
+              <div class="rules-card">
+                <h4>Una sola vez</h4>
+                <p>Las predicciones se cargan antes del Mundial y quedan fijas. No se pueden editar después.</p>
+              </div>
+              <div class="rules-card">
+                <h4>Hasta 2.500 puntos</h4>
+                <p>Acertar al campeón vale 2.500 puntos. Cada categoría tiene su propio sistema de puntaje.</p>
+              </div>
+            </div>
+
+            <h3>¿Cómo se juega?</h3>
+            <ul>
+              <li><strong>Fase de Grupos</strong> — Elegí 1° y 2° de cada grupo</li>
+              <li><strong>Campeones</strong> — Pronosticá hasta dónde llega cada campeón histórico</li>
+              <li><strong>Otros equipos</strong> — Elegí 3 no campeones y su techo</li>
+              <li><strong>🇦🇷 Camino de Argentina</strong> — Rivales de Argentina en cada fase</li>
+              <li><strong>Doble Camiseta</strong> — El debutante que llegará más lejos</li>
+              <li><strong>La Final</strong> — Finalistas, resultado y campeón</li>
+              <li><strong>Goleador</strong> — Máximo goleador y sus goles</li>
+            </ul>
+          </div>
+
+          <button id="btn-start" class="btn btn--primary btn--lg" style="margin-top:32px;">Comenzar a jugar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- FORMULARIO (paso a paso) -->
+    <section id="s-form" class="screen">
+      <div class="progress-bar">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+      <div class="card">
+        <div id="step-dots" class="step-dots"></div>
+        <div id="step-counter" class="step-counter"></div>
+        <div id="step-body" class="card-body"></div>
+        <div id="step-footer" class="card-footer">
+          <button id="btn-back" class="btn btn--ghost">← Atrás</button>
+          <button id="btn-next" class="btn btn--primary">Siguiente →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOMBRE + TAGS + CAPTCHA -->
+    <section id="s-final" class="screen">
+      <div class="card">
+        <div id="final-body" class="card-body"></div>
+        <div id="final-footer" class="card-footer">
+          <button id="btn-final-back" class="btn btn--ghost">← Atrás</button>
+          <button id="btn-submit" class="btn btn--primary" disabled>Enviar predicciones</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONFIRMACIÓN -->
+    <section id="s-done" class="screen">
+      <div class="card card--centered">
+        <div class="card-body">
+          <div class="done-icon">🏆</div>
+          <h2>¡Predicciones registradas!</h2>
+          <p id="done-name" style="font-size:1.15rem;font-weight:600;margin:8px 0;"></p>
+          <p class="landing-desc">Suerte en el mundial. Volvé después del torneo para ver tus resultados.</p>
+          <div id="done-share" style="margin-top:16px;width:100%;max-width:420px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULTADOS / RANKING -->
+    <section id="s-results" class="screen">
+      <div class="card">
+        <div id="results-body" class="card-body"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <div id="detail-modal" class="modal-overlay" onclick="if (event.target === this) hideDetailModal()">
+    <div class="modal-content">
+      <button class="modal-close" onclick="hideDetailModal()">×</button>
+      <div id="detail-body"></div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/scoring.js"></script>
+  <script src="js/simulated-results.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/results.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
