@@ -23,7 +23,7 @@ const TEAMS = [
 // ---------- CAMPEONES MUNDIALES (8) ----------
 const CHAMPIONS = [
   'Argentina', 'Brasil', 'Alemania', 'Francia',
-  'Italia', 'España', 'Inglaterra', 'Uruguay'
+  'España', 'Inglaterra', 'Uruguay'
 ];
 
 // ---------- DEBUTANTES 2026 (first-time WC) ----------

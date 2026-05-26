@@ -42,7 +42,7 @@ const state = {
     nonChamps: [{ team: '', stage: '' }, { team: '', stage: '' }, { team: '', stage: '' }],
     argentina: { grupo: '', rivales: {}, plantarse: null },
     dobleCamiseta: { team: '', mode: '' },
-    final: { team1: '', team2: '', score1: '', score2: '', champion: '' },
+    final: { team1: '', team2: '', score1: '0', score2: '0', champion: '' },
     goleador: { player: '', goals: '' }
   },
   tags: [],
@@ -108,6 +108,32 @@ function isStepComplete(idx) {
   return false;
 }
 
+function isStepPartial(idx) {
+  const step = STEPS[idx];
+  const type = step.type || 'groups';
+
+  if (type === 'groups') {
+    const allGroups = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+    return allGroups.some(g => {
+      const s = state.answers.groups[g];
+      return s && (s.first || s.second);
+    });
+  }
+  if (type === 'champions') return CHAMPIONS.some(c => state.answers.champions[c]);
+  if (type === 'non_champions') return state.answers.nonChamps.some(n => n.team);
+  if (type === 'argentina') {
+    const a = state.answers.argentina;
+    return !!(a.grupo || a.plantarse || Object.values(a.rivales || {}).some(v => v));
+  }
+  if (type === 'doble_camiseta') return !!(state.answers.dobleCamiseta.team || state.answers.dobleCamiseta.mode);
+  if (type === 'final') {
+    const f = state.answers.final;
+    return !!(f.team1 || f.team2 || f.score1 !== '0' || f.score2 !== '0' || f.champion);
+  }
+  if (type === 'goleador') return !!(state.answers.goleador.player || state.answers.goleador.goals !== '');
+  return false;
+}
+
 function allStepsComplete() {
   return STEPS.every((_, i) => isStepComplete(i));
 }
@@ -116,8 +142,9 @@ function allStepsComplete() {
 function renderStepDots() {
   stepDots.innerHTML = STEPS.map((s, i) => {
     const done = isStepComplete(i);
+    const partial = !done && isStepPartial(i);
     const active = i === state.step;
-    const cls = `step-dot${active ? ' active' : ''}${done ? ' done' : ''}`;
+    const cls = `step-dot${active ? ' active' : ''}${done ? ' done' : ''}${partial ? ' partial' : ''}`;
     return `<button class="${cls}" data-step="${i}" title="${STEP_NAMES[i]}">${i + 1}</button>`;
   }).join('');
 }
@@ -130,7 +157,7 @@ function clearStep() {
   else if (t === 'non_champions') state.answers.nonChamps = [{ team: '', stage: '' }, { team: '', stage: '' }, { team: '', stage: '' }];
   else if (t === 'argentina') state.answers.argentina = { grupo: '', rivales: {}, plantarse: null };
   else if (t === 'doble_camiseta') state.answers.dobleCamiseta = { team: '', mode: '' };
-  else if (t === 'final') state.answers.final = { team1: '', team2: '', score1: '', score2: '', champion: '' };
+  else if (t === 'final') state.answers.final = { team1: '', team2: '', score1: '0', score2: '0', champion: '' };
   else if (t === 'goleador') state.answers.goleador = { player: '', goals: '' };
   saveState();
   renderCurrentStep();
@@ -172,6 +199,17 @@ function fillStepRandom() {
 
 /* ---------- RENDER STEPS ---------- */
 let stepScrollPos = 0;
+
+function renderSearchableSelect(options, currentValue, field) {
+  const esc = v => escapeHtml(v);
+  return `<div class="searchable-select">
+    <input type="text" class="search-filter" placeholder="Buscar..." data-field="${esc(field)}">
+    <select data-field="${esc(field)}">
+      <option value="">— Elegí —</option>
+      ${options.map(t => `<option value="${esc(t)}" ${currentValue === t ? 'selected' : ''}>${esc(t)}</option>`).join('')}
+    </select>
+  </div>`;
+}
 
 function renderCurrentStep() {
   const scrollEl = stepBody.querySelector('.step-scroll');
@@ -215,6 +253,9 @@ function renderCurrentStep() {
   $('btn-random').addEventListener('click', fillStepRandom);
 
   btnBack.style.visibility = state.step === 0 ? 'hidden' : 'visible';
+}
+
+function updateNavButtons() {
   const done = allStepsComplete();
   btnNext.textContent = state.step < STEPS.length - 1 ? 'Siguiente →' : (done ? 'Finalizar ✦' : 'Faltan pasos ⚠️');
   btnNext.disabled = !isStepComplete(state.step);
@@ -285,7 +326,7 @@ function renderNonChampions() {
       </div>`;
     } else {
       html += `<div class="champ-row">
-        <select data-field="nonChamps.${i}.team"><option value="">Equipo #${i+1}</option>${nt.map(t => `<option value="${t}">${t}</option>`).join('')}</select>
+        ${renderSearchableSelect(nt, s.team, `nonChamps.${i}.team`)}
       </div>`;
     }
   }
@@ -318,11 +359,8 @@ function renderArgentina() {
       const filled = a.rivales[s];
       html += `<div class="arg-step${filled ? ' done' : ''}">
         <h4>${labels[s]}</h4>
-        <select data-field="argentina.rivales.${s}">
-          <option value="">Rival</option>
-          ${na.map(t => `<option value="${t}" ${a.rivales[s] === t ? 'selected' : ''}>${t}</option>`).join('')}
-        </select>
-        <button class="btn btn--ghost plant-btn" data-action="plantar" data-stage="${s}">🛑 Plantarme acá</button>
+        ${renderSearchableSelect(na, a.rivales[s] || '', `argentina.rivales.${s}`)}
+        <button class="btn btn--ghost plant-btn" data-action="plantar" data-stage="${s}" ${filled ? 'disabled' : ''}>🛑 Plantarme acá</button>
       </div>`;
     }
   });
@@ -365,17 +403,17 @@ function renderFinal() {
     <div class="finalists-row">
       <div class="form-group" style="margin:0;flex:1">
         <label>Finalista A</label>
-        <select data-field="final.team1"><option value="">— Elegí —</option>${TEAMS.map(t => `<option value="${t}" ${f.team1 === t ? 'selected' : ''}>${t}</option>`).join('')}</select>
+        ${renderSearchableSelect(TEAMS, f.team1, 'final.team1')}
       </div>
       <div class="vs-badge">vs</div>
       <div class="form-group" style="margin:0;flex:1">
         <label>Finalista B</label>
-        <select data-field="final.team2"><option value="">— Elegí —</option>${TEAMS.map(t => `<option value="${t}" ${f.team2 === t ? 'selected' : ''}>${t}</option>`).join('')}</select>
+        ${renderSearchableSelect(TEAMS, f.team2, 'final.team2')}
       </div>
     </div>
 
     <div class="score-row">
-      <div class="score-label" style="grid-column:1/-1;margin-bottom:4px;">Resultado 90' (o 120')</div>
+      <div class="score-label" style="grid-column:1/-1;margin-bottom:4px;">Resultado 90' (o 120' si hay alargue)</div>
       <div class="score-group">
         <div class="score-stepper">
           <button class="stepper-btn" data-action="score-step" data-field="score1" data-dir="dec">−</button>
@@ -411,7 +449,7 @@ function renderGoleador() {
   return `
     <div class="form-group">
       <label>Jugador</label>
-      <select data-field="goleador.player"><option value="">— Elegí —</option>${PLAYERS.map(p => `<option value="${p}" ${g.player === p ? 'selected' : ''}>${p}</option>`).join('')}</select>
+      ${renderSearchableSelect(PLAYERS, g.player, 'goleador.player')}
       <p class="help-text" style="margin-top:6px;">"Otro" comparte puntos si hay empate de goleada.</p>
     </div>
     <div class="form-group">
@@ -624,7 +662,7 @@ function hideSuggestions() {
 }
 
 /* ---------- VALIDATION ---------- */
-function validateStep() { btnNext.disabled = !isStepComplete(state.step); }
+function validateStep() { btnNext.disabled = !isStepComplete(state.step); updateNavButtons(); }
 function validateFinal() { return state.fantasyName.length >= 3; }
 function updateSubmitButton() { const b = $('btn-submit'); b && (b.disabled = !validateFinal()); }
 
@@ -671,6 +709,7 @@ function handleFieldChange(target) {
 
   renderStepDots();
   validateStep();
+  updateNavButtons();
 }
 
 function handleGroupPick(target) {
@@ -812,6 +851,18 @@ async function handleSubmit() {
 
 /* ---------- EVENT DELEGATION ---------- */
 document.addEventListener('change', e => { if (e.target.matches('[data-field]')) handleFieldChange(e.target); });
+
+document.addEventListener('input', e => {
+  if (e.target.classList.contains('search-filter')) {
+    const q = e.target.value.toLowerCase().trim();
+    const sel = e.target.parentElement.querySelector('select');
+    if (!sel) return;
+    sel.querySelectorAll('option').forEach(opt => {
+      if (!opt.value) { opt.style.display = ''; return; }
+      opt.style.display = opt.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+});
 
 document.addEventListener('click', e => {
   const t = e.target;
