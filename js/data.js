@@ -114,8 +114,8 @@ const ARG_STAGES = [
 
 // ---------- NOMBRES CORTOS PARA PASOS ----------
 const STEP_NAMES = [
-  'Grupos', 'Campeones', 'Otros', 'Argentina',
-  '1ª vez', 'Final y c.', 'Goleador'
+  'Fase de Grupos', 'Los 7 países que saben cuánto pesa', 'Los 41 restantes', 'El camino de Argentina',
+  'La primera vez', 'Final y campeón', 'Goleador'
 ];
 
 // ---------- DEFINICIÓN DE PASOS DEL FORMULARIO ----------
@@ -123,38 +123,38 @@ const STEPS = [
   {
     id: 'groups',
     title: 'Fase de Grupos',
-    desc: 'Elegí 1° y 2° de cada grupo. Sumás 150 por grupo si acertás en orden y 50 si ambos pasan de ronda pero no en ese orden.',
+    desc: 'Elegí 1° y 2° de cada grupo. Sumás 150 por grupo si acertás en orden. Sumás 50 si ambos pasan los grupos pero no en ese orden.',
     type: 'groups',
     groups: ['A','B','C','D','E','F','G','H','I','J','K','L']
   },
   {
     id: 'champions',
     title: 'Los 7 países que saben cuánto pesa',
-    desc: 'Elegí cuándo se vuelven. Sumás 300 por cada uno, salvo que aciertes que se vuelve en grupos que sumás 500.',
+    desc: 'Elegí cuándo se vuelven. Sumás 300 por cada acierto, salvo que aciertes que se vuelve en grupos que sumás 500.',
     type: 'champions'
   },
   {
     id: 'non_champions',
     title: 'Los 41 restantes',
-    desc: 'Elegí 3 países y acertá cuándo se vuelven. Cuanto más lejos elegís que llega, más sumás si acertás.',
+    desc: 'Elegí 3 países y acertá cuándo se vuelven. Acertar grupos da 100, dieciseisavos 150, octavos 300, cuartos 400, tercer y cuarto puesto 450, final 500.',
     type: 'non_champions'
   },
   {
     id: 'argentina',
-    title: 'El Camino de Argentina',
+    title: 'El camino de Argentina',
     desc: 'Elegí en qué puesto del grupo quedamos y contra quién vamos en cada ronda. Por cada acierto sumás 300. Si te equivocás perdés todo. Podés plantarte y sumar 300 por cada acierto previo.',
     type: 'argentina'
   },
   {
-    id: 'doble_camiseta',
+    id: 'primera_vez',
     title: 'La primera vez',
-    desc: 'Elegí el debutante que llega más lejos. Si acertás compartido son 400. Si le ponés "único" y acertás, son 1000.',
-    type: 'doble_camiseta'
+    desc: 'Elegí el debutante que llega más lejos. Si acertás compartido son 400. Si acertás que es el único de los 4 que llega tan lejo sumás 1000. Si todos se vuelven en grupos, suman 400 todos los que pusieron compartido y 0 todos los que pusieron único.',
+    type: 'primera_vez'
   },
   {
     id: 'final',
     title: 'Final y campeón',
-    desc: 'Elegí los dos equipos que la juegan, el resultado y el campeón. Por cada finalista que acertás sumás 500. Si acertás el resultado del partido (más alargue si hay) sumás 300. Si acertás el campeón sumás 2500.',
+    desc: 'Elegí los dos países que la juegan, el resultado y el campeón. Por cada finalista que acertás sumás 500. Si acertás el resultado del partido (más eventual alargue) sumás 300. Si acertás el campeón sumás 2500.',
     type: 'final'
   },
   {

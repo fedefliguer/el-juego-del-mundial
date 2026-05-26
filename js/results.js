@@ -210,7 +210,7 @@ function renderPredictionDetail(name, tags, answers) {
   });
   html += '</div>';
 
-  html += '<div class="detail-block"><h4>Otros equipos</h4>';
+  html += '<div class="detail-block"><h4>El resto del mundo</h4>';
   (a.nonChamps || []).forEach(n => {
     if (n.team && n.stage) html += `<span class="detail-item">${escapeHtml(n.team)} → ${stageLabel(n.stage)}</span>`;
   });

@@ -97,7 +97,7 @@ function isStepComplete(idx) {
     if (a.plantarse) return true;
     return ['dieciseisavos','octavos','cuartos','semis','final'].every(s => a.rivales?.[s]);
   }
-  if (type === 'doble_camiseta') return !!(state.answers.dobleCamiseta.team && state.answers.dobleCamiseta.mode);
+  if (type === 'primera_vez') return !!(state.answers.dobleCamiseta.team && state.answers.dobleCamiseta.mode);
   if (type === 'final') {
     const f = state.answers.final;
     if (!(f.team1 && f.team2 && f.team1 !== f.team2)) return false;
@@ -125,7 +125,7 @@ function isStepPartial(idx) {
     const a = state.answers.argentina;
     return !!(a.grupo || a.plantarse || Object.values(a.rivales || {}).some(v => v));
   }
-  if (type === 'doble_camiseta') return !!(state.answers.dobleCamiseta.team || state.answers.dobleCamiseta.mode);
+  if (type === 'primera_vez') return !!(state.answers.dobleCamiseta.team || state.answers.dobleCamiseta.mode);
   if (type === 'final') {
     const f = state.answers.final;
     return !!(f.team1 || f.team2 || f.score1 !== '0' || f.score2 !== '0' || f.champion);
@@ -156,7 +156,7 @@ function clearStep() {
   else if (t === 'champions') state.answers.champions = {};
   else if (t === 'non_champions') state.answers.nonChamps = [{ team: '', stage: '' }, { team: '', stage: '' }, { team: '', stage: '' }];
   else if (t === 'argentina') state.answers.argentina = { grupo: '', rivales: {}, plantarse: null };
-  else if (t === 'doble_camiseta') state.answers.dobleCamiseta = { team: '', mode: '' };
+  else if (t === 'primera_vez') state.answers.dobleCamiseta = { team: '', mode: '' };
   else if (t === 'final') state.answers.final = { team1: '', team2: '', score1: '0', score2: '0', champion: '' };
   else if (t === 'goleador') state.answers.goleador = { player: '', goals: '' };
   saveState();
@@ -201,7 +201,7 @@ function fillStepRandom() {
     state.answers.argentina = { grupo: String(Math.floor(Math.random() * 4) + 1), rivales: {}, plantarse: null };
     const na = TEAMS.filter(t => t !== 'Argentina');
     ['dieciseisavos','octavos','cuartos','semis','final'].forEach(s => state.answers.argentina.rivales[s] = na[Math.floor(Math.random() * na.length)]);
-  } else if (type === 'doble_camiseta') {
+  } else if (type === 'primera_vez') {
     state.answers.dobleCamiseta = { team: DEBUTANTS[Math.floor(Math.random() * DEBUTANTS.length)], mode: Math.random() > 0.5 ? 'solo' : 'compartido' };
   } else if (type === 'final') {
     const t = [...TEAMS].sort(() => Math.random() - 0.5);
@@ -245,7 +245,7 @@ function renderCurrentStep() {
   else if (type === 'champions') body = renderChampions();
   else if (type === 'non_champions') body = renderNonChampions();
   else if (type === 'argentina') body = renderArgentina();
-  else if (type === 'doble_camiseta') body = renderDobleCamiseta();
+  else if (type === 'primera_vez') body = renderDobleCamiseta();
   else if (type === 'final') body = renderFinal();
   else if (type === 'goleador') body = renderGoleador();
 
@@ -349,7 +349,7 @@ function renderNonChampions() {
       </div>`;
     }
   }
-  return html + '</div><p class="help-text" style="margin-top:8px;">Se puede apostar más de una vez al mismo equipo.</p>';
+  return html + '</div><p class="help-text" style="margin-top:8px;">Tip: Se puede apostar dos o tres veces al mismo país, y por cada una sumás los puntos.</p>';
 }
 
 /* --- ARGENTINA PATH --- */
@@ -406,7 +406,7 @@ function renderDobleCamiseta() {
         </button>
         <button class="choice-card choice-card--desc${dc.mode === 'compartido' ? ' active' : ''}" data-action="dc-mode" data-mode="compartido">
           <strong>Compartido</strong>
-          <span>Llega con otro(s) debutante(s)</span>
+          <span>Puede llegar como único debutante pero también compartiendo con otros</span>
         </button>
       </div>
     </div>`;
@@ -457,7 +457,7 @@ function renderFinal() {
             <button class="choice-card${f.champion === '1' ? ' active' : ''}" data-action="set-champion" data-val="1">${f.team1}</button>
             <button class="choice-card${f.champion === '2' ? ' active' : ''}" data-action="set-champion" data-val="2">${f.team2}</button>
           </div>`
-        : `<p class="help-text">Primero elegí los dos finalistas.</p>`}
+        : `<p class="help-text">Primero elegí dos finalistas distintos.</p>`}
     </div>`;
 }
 
@@ -524,7 +524,7 @@ function renderSummary() {
   });
   html += '</div>';
 
-  html += '<div class="summary-block"><h4>Otros equipos</h4>';
+  html += '<div class="summary-block"><h4>El resto del mundo</h4>';
   state.answers.nonChamps.forEach(n => {
     if (n.team && n.stage) {
       const label = STAGES.find(s => s.value === n.stage)?.label || n.stage;
