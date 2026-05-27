@@ -100,17 +100,14 @@ const PLAYERS = [
   'Otro'
 ];
 
-// ---------- ORDEN DE PASE DE FASE (Argentina) ----------
-const ARG_STAGES = [
-  { key: 'grupos',  label: 'Fase de grupos' },
-  { key: 'dieciseisavos',  label: 'Dieciseisavos' },
-  { key: 'octavos',  label: 'Octavos de final' },
-  { key: 'cuartos',  label: 'Cuartos de final' },
-  { key: 'tercero',  label: 'Tercer y cuarto puesto' },
-  { key: 'semis',   label: 'Semifinal' },
-  { key: 'final',   label: 'Final' },
-  { key: 'gana',    label: 'Campeón' }
-];
+
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+let allTournaments = [];
 
 // ---------- NOMBRES CORTOS PARA PASOS ----------
 const STEP_NAMES = [

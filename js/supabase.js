@@ -200,6 +200,24 @@ const supabase = {
     return await res.json();
   },
 
+  // Verifica contraseña admin sin side effects (read-only)
+  async adminVerify(secret) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_get_logs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({ p_secret: secret })
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      if (text.includes('admin_unauthorized')) throw new Error('Contraseña incorrecta');
+      throw new Error(text);
+    }
+  },
+
   // Admin: obtener logs
   async adminGetLogs(secret) {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_get_logs`, {

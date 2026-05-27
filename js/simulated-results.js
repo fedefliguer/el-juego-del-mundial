@@ -24,8 +24,7 @@ const SIMULATED_RESULTS = {
     'Argentina': 'final',
     'Brasil': 'cuartos',
     'Alemania': 'octavos',
-    'Francia': 'semis',
-    'Italia': 'grupos',
+    'Francia': 'cuartos',
     'España': 'octavos',
     'Inglaterra': 'final',
     'Uruguay': 'cuartos'

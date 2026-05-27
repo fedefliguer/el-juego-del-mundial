@@ -2,17 +2,10 @@
 // El Juego del Mundial 2026 — Resultados / Ranking
 // ============================================
 
-function escapeHtml(str) {
-  const d = document.createElement('div');
-  d.textContent = str;
-  return d.innerHTML;
-}
-
 const PAGE_SIZE = 50;
 let rankingData = null;
 let rankingPage = 0;
 let resultsLive = false;
-let allTournaments = [];
 
 async function loadRanking() {
   const container = $('results-body');
@@ -94,7 +87,7 @@ function renderGeneralRanking(data) {
 
 function renderTable(data, allTags, view) {
   const urlTag = new URLSearchParams(window.location.search).get('tag');
-  const selectedTag = view === 'tag' ? (urlTag || allTags[0] || '') : null;
+  const selectedTag = view === 'tag' ? (urlTag || allTags[0]?.name || '') : null;
   const filtered = selectedTag ? data.filter(d => d.tags.includes(selectedTag)) : data;
   const sorted = view === 'tag' ? [...filtered].sort((a, b) => resultsLive ? b.total - a.total : a.fantasyName.localeCompare(b.fantasyName)) : data;
 

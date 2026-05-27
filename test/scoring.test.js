@@ -189,37 +189,76 @@ describe('Camino de Argentina', () => {
 
   const R = {
     argentina: {
+      grupo: '1',
       rivales: { dieciseisavos: 'Senegal', octavos: 'Uruguay', cuartos: 'Países Bajos', semis: 'Inglaterra', final: 'Francia' },
       plantarse: null,
     }
   };
 
-  test('cadena completa = 5 × 300', () => {
+  test('cadena completa = 6 × 300 (grupo + 5 rivales)', () => {
     const a = {
       argentina: {
+        grupo: '1',
         rivales: { dieciseisavos: 'Senegal', octavos: 'Uruguay', cuartos: 'Países Bajos', semis: 'Inglaterra', final: 'Francia' },
         plantarse: null,
       }
     };
     const s = computeScore(a, R);
-    expect(s.breakdown.argentina).toBe(5 * PUNTOS.argentina_por_acierto);
+    expect(s.breakdown.argentina).toBe(6 * PUNTOS.argentina_por_acierto);
   });
 
   test('cadena se corta al primer error', () => {
     const a = {
       argentina: {
+        grupo: '1',
         rivales: { dieciseisavos: 'Senegal', octavos: 'Brasil', cuartos: 'Países Bajos', semis: 'Inglaterra', final: 'Francia' },
         plantarse: null,
       }
     };
     const s = computeScore(a, R);
-    expect(s.breakdown.argentina).toBe(PUNTOS.argentina_por_acierto); // Solo el primero
+    expect(s.breakdown.argentina).toBe(2 * PUNTOS.argentina_por_acierto); // grupo + primer rival
   });
 
-  test('sin rivales = 0', () => {
+  test('solo grupo acertado (sin rivales ni plantarse) = 300', () => {
     const s = computeScore(
       { argentina: { grupo: '1', rivales: {}, plantarse: null } },
       R
+    );
+    expect(s.breakdown.argentina).toBe(PUNTOS.argentina_por_acierto);
+  });
+
+  test('Argentina sale 4to y se pronosticó 4to = 300', () => {
+    const r = { argentina: { grupo: '4', rivales: {}, plantarse: null } };
+    const s = computeScore(
+      { argentina: { grupo: '4', rivales: {}, plantarse: null } },
+      r
+    );
+    expect(s.breakdown.argentina).toBe(PUNTOS.argentina_por_acierto);
+  });
+
+  test('Argentina sale 3ro y se pronosticó 3ro = 300', () => {
+    const r = { argentina: { grupo: '3', rivales: {}, plantarse: null } };
+    const s = computeScore(
+      { argentina: { grupo: '3', rivales: {}, plantarse: null } },
+      r
+    );
+    expect(s.breakdown.argentina).toBe(PUNTOS.argentina_por_acierto);
+  });
+
+  test('Argentina sale 4to pero se pronosticó 3ro = 0', () => {
+    const r = { argentina: { grupo: '4', rivales: {}, plantarse: null } };
+    const s = computeScore(
+      { argentina: { grupo: '3', rivales: {}, plantarse: null } },
+      r
+    );
+    expect(s.breakdown.argentina).toBe(0);
+  });
+
+  test('Argentina sale 4to pero se pronosticó 1ro (con rivales) = 0', () => {
+    const r = { argentina: { grupo: '4', rivales: {}, plantarse: null } };
+    const s = computeScore(
+      { argentina: { grupo: '1', rivales: { dieciseisavos: 'Senegal' }, plantarse: null } },
+      r
     );
     expect(s.breakdown.argentina).toBe(0);
   });
@@ -335,6 +374,15 @@ describe('Goleador', () => {
     );
     expect(s.breakdown.goleador).toBe(PUNTOS.goleador_ambos);
   });
+
+  test('solo goles correctos con goals como number en results = 100', () => {
+    const r = { goleador: { player: 'Messi', goals: 8 } };
+    const s = computeScore(
+      { goleador: { player: 'Mbappé', goals: '8' } },
+      r
+    );
+    expect(s.breakdown.goleador).toBe(PUNTOS.goleador_cantidad);
+  });
 });
 
 describe('Integración — score total', () => {
@@ -347,7 +395,7 @@ describe('Integración — score total', () => {
     const expectedGroups = 1 * PUNTOS.grupo_acierto_orden; // 1 grupo en mock
     const expectedChampions = 2 * PUNTOS.campeon_otra_fase;
     const expectedNonChamps = PUNTOS.no_campeon_semis + PUNTOS.no_campeon_cuartos;
-    const expectedArgentina = 5 * PUNTOS.argentina_por_acierto;
+    const expectedArgentina = 6 * PUNTOS.argentina_por_acierto;
     const expectedDoble = PUNTOS.doble_solo;
     const expectedFinal = PUNTOS.final_equipo_finalista + PUNTOS.final_campeon + PUNTOS.final_resultado;
     const expectedGoleador = PUNTOS.goleador_ambos;

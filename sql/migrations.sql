@@ -162,3 +162,15 @@ BEGIN
 END;
 $$;
 GRANT EXECUTE ON FUNCTION admin_get_logs TO anon;
+
+-- 10. Migration tracking — saber qué migraciones están aplicadas
+CREATE TABLE IF NOT EXISTS schema_version (
+  version INTEGER PRIMARY KEY,
+  applied_at TIMESTAMPTZ DEFAULT now(),
+  description TEXT NOT NULL
+);
+
+INSERT INTO schema_version (version, description) VALUES
+  (1, 'Schema inicial — predictions, results, RLS'),
+  (2, 'check_answers_size, rate_limiting, RLS restrictiva, config, tournaments, logs, admin RPCs')
+ON CONFLICT (version) DO NOTHING;

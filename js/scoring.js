@@ -52,7 +52,7 @@ function puntosNoCampeon(fase) {
     'octavos': PUNTOS.no_campeon_octavos,
     cuartos: PUNTOS.no_campeon_cuartos,
     tercero: PUNTOS.no_campeon_tercero,
-    semis: PUNTOS.no_campeon_semis,
+    semis: PUNTOS.no_campeon_semis, // no expuesto en UI (3° y 4° reemplaza), pero admin puede cargarlo
     final: PUNTOS.no_campeon_final,
   };
   return mapa[fase] || 0;
@@ -108,24 +108,46 @@ function computeScore(answers, realResults) {
 
   // Argentina
   if (r.argentina && answers.argentina) {
+    const real = r.argentina;
+    const pred = answers.argentina;
+    let pts = 0;
     const stages = ['dieciseisavos','octavos','cuartos','semis','final'];
-    let chainOk = true;
-    for (const s of stages) {
-      if (!chainOk) break;
-      if (answers.argentina.rivales?.[s]) {
-        if (answers.argentina.rivales[s] === r.argentina.rivales?.[s]) {
-          breakdown.argentina += PUNTOS.argentina_por_acierto;
-          total += PUNTOS.argentina_por_acierto;
+
+    if (pred.grupo && pred.grupo === real.grupo) {
+      pts += PUNTOS.argentina_por_acierto;
+    }
+
+    if (pts > 0) {
+      for (const s of stages) {
+        const realHasRival = !!real.rivales?.[s];
+        const predHasRival = !!pred.rivales?.[s];
+        const predPlantHere = pred.plantarse === s;
+
+        if (realHasRival) {
+          if (predPlantHere) {
+            break;
+          } else if (predHasRival && pred.rivales[s] === real.rivales[s]) {
+            pts += PUNTOS.argentina_por_acierto;
+          } else if (predHasRival && pred.rivales[s] !== real.rivales[s]) {
+            break;
+          } else {
+            break;
+          }
         } else {
-          chainOk = false;
+          if (predPlantHere) {
+            break;
+          } else if (predHasRival) {
+            pts = 0;
+            break;
+          } else {
+            break;
+          }
         }
-      } else if (answers.argentina.plantarse) {
-        const idx = stages.indexOf(answers.argentina.plantarse);
-        const realIdx = stages.indexOf(r.argentina.plantarse || '');
-        if (idx === realIdx) chainOk = true;
-        else chainOk = false;
       }
     }
+
+    breakdown.argentina += pts;
+    total += pts;
   }
 
   // Doble Camiseta
@@ -151,7 +173,7 @@ function computeScore(answers, realResults) {
       breakdown.final += PUNTOS.final_campeon;
       total += PUNTOS.final_campeon;
     }
-    if (teamsOk && af.score1 === rf.score1 && af.score2 === rf.score2) {
+    if (teamsOk && String(af.score1) === String(rf.score1) && String(af.score2) === String(rf.score2)) {
       breakdown.final += PUNTOS.final_resultado;
       total += PUNTOS.final_resultado;
     }
@@ -160,13 +182,13 @@ function computeScore(answers, realResults) {
   // Goleador
   if (r.goleador && answers.goleador?.player) {
     const ag = answers.goleador;
-    if (ag.player === r.goleador.player && ag.goals === r.goleador.goals) {
+    if (ag.player === r.goleador.player && String(ag.goals) === String(r.goleador.goals)) {
       breakdown.goleador += PUNTOS.goleador_ambos;
       total += PUNTOS.goleador_ambos;
     } else if (ag.player === r.goleador.player) {
       breakdown.goleador += PUNTOS.goleador_jugador;
       total += PUNTOS.goleador_jugador;
-    } else if (ag.goals === r.goleador.goals) {
+    } else if (String(ag.goals) === String(r.goleador.goals)) {
       breakdown.goleador += PUNTOS.goleador_cantidad;
       total += PUNTOS.goleador_cantidad;
     }

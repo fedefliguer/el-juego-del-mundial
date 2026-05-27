@@ -41,13 +41,9 @@ function renderAdminLogin() {
     </div>`;
   $('admin-login-btn').addEventListener('click', () => {
     adminSecret = $('admin-pass').value.trim();
-    // Verify by trying to get current live status
-    supabase.adminToggleLive(adminSecret).then(res => {
-      // If it worked, toggle it back and show dashboard
-      supabase.adminToggleLive(adminSecret).then(() => renderAdminDashboard());
-    }).catch(() => {
-      $('admin-error').style.display = 'block';
-    });
+    supabase.adminVerify(adminSecret)
+      .then(() => renderAdminDashboard())
+      .catch(() => { $('admin-error').style.display = 'block'; });
   });
   $('admin-pass').addEventListener('keydown', e => {
     if (e.key === 'Enter') $('admin-login-btn').click();
@@ -116,7 +112,6 @@ async function renderAdminDashboard() {
     try {
       await supabase.adminSetResult(cat, json, adminSecret);
       status.innerHTML = '✅ Cargado';
-      supabase.logError(`Admin loaded ${cat}`, { category: cat });
     } catch (err) {
       status.innerHTML = `❌ Error: ${err.message}`;
     }

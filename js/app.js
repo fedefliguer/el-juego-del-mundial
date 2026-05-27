@@ -2,12 +2,6 @@
 // El Juego del Mundial 2026 — App Principal
 // ============================================
 
-function escapeHtml(str) {
-  const d = document.createElement('div');
-  d.textContent = str;
-  return d.innerHTML;
-}
-
 const STORAGE_KEY = 'mundial2026_state';
 
 const PLACEHOLDER_NAMES = [
@@ -42,7 +36,13 @@ function loadSavedState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
     const saved = JSON.parse(raw);
-    if (saved.answers) state.answers = saved.answers;
+    if (saved.answers) {
+      state.answers = saved.answers;
+      // Migración: goals: '' → '1' (v1→v2)
+      if (state.answers.goleador && state.answers.goleador.goals === '') {
+        state.answers.goleador.goals = '1';
+      }
+    }
     if (saved.tags) state.tags = saved.tags;
     if (saved.fantasyName) state.fantasyName = saved.fantasyName;
     if (saved.step !== undefined) state.step = saved.step;
@@ -60,7 +60,7 @@ const state = {
     argentina: { grupo: '', rivales: {}, plantarse: null },
     dobleCamiseta: { team: '', mode: '' },
     final: { team1: '', team2: '', score1: '0', score2: '0', champion: '' },
-    goleador: { player: '', goals: '' }
+    goleador: { player: '', goals: '1' }
   },
   tags: [],
   fantasyName: '',
@@ -90,6 +90,7 @@ function showScreen(name) {
 }
 
 let toastTimer;
+let nameAvailable = null;
 function showToast(msg) {
   clearTimeout(toastTimer);
   toast.textContent = msg;
@@ -179,7 +180,7 @@ function clearStep() {
   else if (t === 'argentina') state.answers.argentina = { grupo: '', rivales: {}, plantarse: null };
   else if (t === 'primera_vez') state.answers.dobleCamiseta = { team: '', mode: '' };
   else if (t === 'final') state.answers.final = { team1: '', team2: '', score1: '0', score2: '0', champion: '' };
-  else if (t === 'goleador') state.answers.goleador = { player: '', goals: '' };
+  else if (t === 'goleador') state.answers.goleador = { player: '', goals: '1' };
   saveState();
   renderCurrentStep();
 }
@@ -192,7 +193,7 @@ function resetAll() {
     argentina: { grupo: '', rivales: {}, plantarse: null },
     dobleCamiseta: { team: '', mode: '' },
     final: { team1: '', team2: '', score1: '0', score2: '0', champion: '' },
-    goleador: { player: '', goals: '' }
+    goleador: { player: '', goals: '1' }
   };
   state.tags = [];
   state.fantasyName = '';
@@ -720,6 +721,7 @@ function renderFinalScreen() {
   let nameCheckTimer = null;
   nameInput.addEventListener('input', () => {
     state.fantasyName = nameInput.value.trim();
+    nameAvailable = null;
     saveState();
     const status = $('ff-name-status');
     if (state.fantasyName.length < 3) {
@@ -731,6 +733,7 @@ function renderFinalScreen() {
       clearTimeout(nameCheckTimer);
       nameCheckTimer = setTimeout(async () => {
         const exists = await supabase.nameExists(state.fantasyName);
+        nameAvailable = !exists;
         if (exists) {
           status.textContent = '❌ Ese nombre ya existe. Elegí otro.';
           status.style.color = 'var(--danger)';
@@ -760,6 +763,10 @@ function renderFinalScreen() {
   tagInput.addEventListener('focus', () => {
     if (tagInput.value.trim()) showTagSuggestions(tagInput.value.trim());
   });
+
+  if (state.fantasyName.length >= 3) {
+    nameInput.dispatchEvent(new Event('input'));
+  }
 
   validateFinal();
   updateSubmitButton();
@@ -798,7 +805,7 @@ function hideSuggestions() {
 }
 
 /* ---------- VALIDATION ---------- */
-function validateFinal() { return state.fantasyName.length >= 3; }
+function validateFinal() { return state.fantasyName.length >= 3 && nameAvailable !== false; }
 function updateSubmitButton() { const b = $('btn-submit'); b && (b.disabled = !validateFinal()); }
 
 /* ---------- HANDLERS ---------- */
