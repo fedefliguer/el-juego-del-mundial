@@ -68,11 +68,14 @@ const state = {
 };
 
 const $ = id => document.getElementById(id);
-const screens = {
-  landing: $('s-landing'), form: $('s-form'),
-  final: $('s-final'), done: $('s-done'),
-  results: $('s-results')
-};
+const screens = {};
+function initScreens() {
+  ['landing','form','final','done','results','admin'].forEach(id => {
+    const el = $(`s-${id}`);
+    if (el) screens[id] = el;
+  });
+}
+initScreens();
 const stepBody = $('step-body');
 const stepCounter = $('step-counter');
 const stepDots = $('step-dots');
@@ -1048,6 +1051,11 @@ document.addEventListener('click', e => {
   if (actionEl) {
     if (actionEl.dataset.action === 'group-pick') handleGroupPick(actionEl);
     else handleAction(actionEl);
+  }
+  if (t.classList.contains('nav-brand') && typeof showAdminScreen === 'function') {
+    t.dataset.clicks = (parseInt(t.dataset.clicks) || 0) + 1;
+    if (parseInt(t.dataset.clicks) >= 5) { t.dataset.clicks = '0'; showAdminScreen(); }
+    return;
   }
   if (t.id === 'btn-start') { showScreen('form'); if (!localStorage.getItem(STORAGE_KEY)) state.step = 0; renderCurrentStep(); }
   if (t.id === 'btn-next') nextStep();

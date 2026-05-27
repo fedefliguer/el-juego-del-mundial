@@ -117,3 +117,48 @@ RETURNS void LANGUAGE SQL AS $$
   INSERT INTO logs (level, message, details) VALUES ('error', p_message, p_details);
 $$;
 GRANT EXECUTE ON FUNCTION log_error TO anon;
+
+-- 8. Admin: UNIQUE en category para upsert
+ALTER TABLE results ADD CONSTRAINT results_category_key UNIQUE (category);
+
+-- 9. Admin: secret + funciones RPC con SECURITY DEFINER
+INSERT INTO config (key, value) VALUES ('admin_secret', '"admin123"')
+  ON CONFLICT (key) DO NOTHING;
+
+CREATE OR REPLACE FUNCTION admin_set_result(p_category TEXT, p_result JSONB, p_secret TEXT)
+RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$
+BEGIN
+  IF p_secret <> ((SELECT value #>> '{}' FROM config WHERE key = 'admin_secret')) THEN
+    RAISE EXCEPTION 'admin_unauthorized';
+  END IF;
+  INSERT INTO results (category, result, updated_at) VALUES (p_category, p_result, now())
+  ON CONFLICT (category) DO UPDATE SET result = EXCLUDED.result, updated_at = now();
+END;
+$$;
+GRANT EXECUTE ON FUNCTION admin_set_result TO anon;
+
+CREATE OR REPLACE FUNCTION admin_toggle_live(p_secret TEXT)
+RETURNS boolean LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+  new_val boolean;
+BEGIN
+  IF p_secret <> ((SELECT value #>> '{}' FROM config WHERE key = 'admin_secret')) THEN
+    RAISE EXCEPTION 'admin_unauthorized';
+  END IF;
+  SELECT NOT (value = 'true'::jsonb) INTO new_val FROM config WHERE key = 'results_live';
+  UPDATE config SET value = to_jsonb(new_val) WHERE key = 'results_live';
+  RETURN new_val;
+END;
+$$;
+GRANT EXECUTE ON FUNCTION admin_toggle_live TO anon;
+
+CREATE OR REPLACE FUNCTION admin_get_logs(p_secret TEXT)
+RETURNS TABLE(level TEXT, message TEXT, created_at TIMESTAMPTZ) LANGUAGE plpgsql SECURITY DEFINER AS $$
+BEGIN
+  IF p_secret <> ((SELECT value #>> '{}' FROM config WHERE key = 'admin_secret')) THEN
+    RAISE EXCEPTION 'admin_unauthorized';
+  END IF;
+  RETURN QUERY SELECT logs.level, logs.message, logs.created_at FROM logs ORDER BY logs.created_at DESC LIMIT 50;
+END;
+$$;
+GRANT EXECUTE ON FUNCTION admin_get_logs TO anon;

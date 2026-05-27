@@ -130,7 +130,7 @@ function computeScore(answers, realResults) {
 
   // Doble Camiseta
   if (r.dobleCamiseta && answers.dobleCamiseta?.team) {
-    if (answers.dobleCamiseta.team === r.dobleCamiseta.team) {
+    if (answers.dobleCamiseta.team === r.dobleCamiseta.team && answers.dobleCamiseta.mode === r.dobleCamiseta.mode) {
       const pts = answers.dobleCamiseta.mode === 'solo' ? PUNTOS.doble_solo : PUNTOS.doble_compartido;
       breakdown.dobleCamiseta += pts;
       total += pts;
@@ -145,7 +145,9 @@ function computeScore(answers, realResults) {
       breakdown.final += PUNTOS.final_equipo_finalista;
       total += PUNTOS.final_equipo_finalista;
     }
-    if (af.champion === rf.champion) {
+    const champTeam = af.champion === '1' ? af.team1 : af.team2;
+    const realChampTeam = rf.champion === '1' ? rf.team1 : rf.team2;
+    if (champTeam === realChampTeam) {
       breakdown.final += PUNTOS.final_campeon;
       total += PUNTOS.final_campeon;
     }
@@ -172,3 +174,5 @@ function computeScore(answers, realResults) {
 
   return { total, breakdown };
 }
+
+if (typeof module !== 'undefined') module.exports = { computeScore, PUNTOS, puntosNoCampeon, puntosCampeon };

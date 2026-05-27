@@ -163,6 +163,58 @@ const supabase = {
     }
   },
 
+  // Admin: cargar resultado (requiere secret)
+  async adminSetResult(category, resultJson, secret) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_set_result`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({ p_category: category, p_result: JSON.parse(resultJson), p_secret: secret })
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      if (text.includes('admin_unauthorized')) throw new Error('Contraseña incorrecta');
+      throw new Error(text);
+    }
+  },
+
+  // Admin: toggle results_live
+  async adminToggleLive(secret) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_toggle_live`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({ p_secret: secret })
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      if (text.includes('admin_unauthorized')) throw new Error('Contraseña incorrecta');
+      throw new Error(text);
+    }
+    return await res.json();
+  },
+
+  // Admin: obtener logs
+  async adminGetLogs(secret) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_get_logs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({ p_secret: secret })
+    });
+    if (!res.ok) return [];
+    return await res.json();
+  },
+
   // Loguea un error en el servidor
   async logError(message, details) {
     try {
