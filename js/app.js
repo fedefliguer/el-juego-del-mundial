@@ -673,7 +673,6 @@ function renderSummary() {
 }
 
 /* ---------- FINAL SCREEN ---------- */
-let allTournaments = [];
 let tagAutocompleteTimer = null;
 
 function renderFinalScreen() {
