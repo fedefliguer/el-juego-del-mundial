@@ -28,12 +28,13 @@ CREATE TRIGGER trg_check_insert_rate
   FOR EACH ROW EXECUTE FUNCTION check_insert_rate();
 
 -- 3. RLS más restrictiva: validar longitud de fantasy_name y tags
+-- NOTA: array_length devuelve NULL para arrays vacíos, por eso el OR
 DROP POLICY IF EXISTS anon_insert_predictions ON predictions;
 CREATE POLICY anon_insert_predictions ON predictions
   FOR INSERT TO anon WITH CHECK (
     octet_length(answers::text) <= 10240
     AND length(fantasy_name) BETWEEN 3 AND 30
-    AND array_length(tags, 1) <= 5
+    AND (array_length(tags, 1) IS NULL OR array_length(tags, 1) <= 5)
   );
 
 -- 4. Tabla de configuración (resultados live, etc.)
