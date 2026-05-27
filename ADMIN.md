@@ -6,129 +6,125 @@
 npx vercel --prod
 ```
 
-El proyecto se deploya a https://el-juego-del-mundial.vercel.app
+Proyecto: https://el-juego-del-mundial.vercel.app
 
-No requiere build step. Es HTML/CSS/JS estático.
+Static HTML/CSS/JS, no requiere build step.
 
 ## Base de datos (Supabase)
 
-Migraciones ya ejecutadas (`sql/schema.sql` + `sql/migrations.sql`).
+Migraciones en `sql/schema.sql` (schema inicial) y `sql/migrations.sql` (parches).
+
+Para aplicar migraciones nuevas, copiar el bloque correspondiente al SQL Editor de Supabase y ejecutar.
 
 ### Tabla `config`
 
-Almacena flags del sistema. Se crea con `migrations.sql`.
-
 | key | value | Descripción |
 |---|---|---|
-| `results_live` | `false` | `true` = ranking muestra puntajes reales. `false` = muestra todo en 0 |
+| `results_live` | `false` | `true` = ranking muestra puntajes reales. `false` = todo en 0 (preview) |
 
-Para activar los resultados (cuando empiece el Mundial):
-
+Para activar:
 ```sql
 UPDATE config SET value = 'true' WHERE key = 'results_live';
 ```
 
-### Tabla `results` — Cargar resultados reales
+### Tabla `results` — Resultados del torneo
 
-Los resultados los cargás vos a medida que avanza el torneo. Estructura:
+Se cargan a medida que avanza el Mundial. Un row por categoría.
 
-| Columna | Tipo | Descripción |
-|---|---|---|
-| `id` | UUID | auto |
-| `category` | TEXT | `groups`, `champions`, `nonChamps`, `argentina`, `dobleCamiseta`, `final`, `goleador` |
-| `result` | JSONB | El resultado en el mismo formato que `SIMULATED_RESULTS` |
-| `updated_at` | TIMESTAMPTZ | auto |
-
-Ejemplo de INSERT para cada categoría:
-
-**Fase de Grupos:**
 ```sql
+-- Fase de grupos
 INSERT INTO results (category, result) VALUES ('groups', '{
   "A": {"first": "México", "second": "Sudáfrica"},
-  "B": {"first": "Suiza", "second": "Canadá"},
-  ...
+  "B": {"first": "Suiza", "second": "Canadá"}
 }'::jsonb);
-```
 
-**Campeones:**
-```sql
+-- Campeones
 INSERT INTO results (category, result) VALUES ('champions', '{
-  "Argentina": "final",
-  "Brasil": "cuartos",
-  ...
+  "Argentina": "final", "Brasil": "cuartos"
 }'::jsonb);
-```
 
-**No campeones:**
-```sql
+-- No campeones
 INSERT INTO results (category, result) VALUES ('nonChamps', '[
-  {"team": "Países Bajos", "stage": "semis"},
-  {"team": "Portugal", "stage": "cuartos"},
-  {"team": "Bélgica", "stage": "cuartos"}
+  {"team": "Países Bajos", "stage": "semis"}
 ]'::jsonb);
-```
 
-**Camino de Argentina:**
-```sql
+-- Camino de Argentina
 INSERT INTO results (category, result) VALUES ('argentina', '{
   "grupo": "1",
-  "rivales": {
-    "dieciseisavos": "Senegal",
-    "octavos": "Uruguay",
-    "cuartos": "Países Bajos",
-    "semis": "Inglaterra",
-    "final": "Francia"
-  },
+  "rivales": {"dieciseisavos": "Senegal", "octavos": "Uruguay"},
   "plantarse": null
 }'::jsonb);
-```
 
-**Doble Camiseta:**
-```sql
+-- Doble camiseta
 INSERT INTO results (category, result) VALUES ('dobleCamiseta', '{
-  "team": "Curazao",
-  "mode": "solo"
+  "team": "Curazao", "mode": "solo"
 }'::jsonb);
-```
 
-**Final:**
-```sql
+-- Final
 INSERT INTO results (category, result) VALUES ('final', '{
-  "team1": "Argentina",
-  "team2": "Inglaterra",
-  "score1": "3",
-  "score2": "1",
-  "champion": "1"
+  "team1": "Argentina", "team2": "Inglaterra",
+  "score1": "3", "score2": "1", "champion": "1"
 }'::jsonb);
-```
 
-**Goleador:**
-```sql
+-- Goleador
 INSERT INTO results (category, result) VALUES ('goleador', '{
-  "player": "Lionel Messi (Argentina)",
-  "goals": "8"
+  "player": "Lionel Messi (Argentina)", "goals": "8"
 }'::jsonb);
 ```
 
-> Se pueden cargar resultados parciales. Por ejemplo, apenas termina la fase de grupos cargás `groups` y el ranking se actualiza solo con los puntos de esa categoría.
+Se pueden cargar parcialmente (ej: solo groups ni bien termina la fase).
 
 ### Tabla `predictions`
 
-Las predicciones de los usuarios. No tocar directamente.
+Predicciones de los usuarios. No tocar directamente. Tiene UNIQUE en `fantasy_name`.
+
+### Tabla `tournaments`
+
+Torneos públicos y privados. Se crean solos desde la app. No tocar directamente.
+
+### Tabla `logs` — Errores del servidor
+
+Los errores al guardar predicciones se registran automáticamente acá.
+
+```sql
+-- Ver todos los errores (más recientes primero)
+SELECT * FROM logs ORDER BY created_at DESC;
+
+-- Ver errores de hoy
+SELECT * FROM logs WHERE created_at > now() - interval '1 day' ORDER BY created_at DESC;
+```
 
 ## Scoring
 
-Los puntajes se definen en `js/scoring.js` (constante `PUNTOS`). Editables antes del Mundial. Después no conviene tocarlos porque cambiarían los puntajes retroactivamente.
+Los puntajes se definen en `js/scoring.js` (constante `PUNTOS`). Mejor no tocarlos después de que arranque el Mundial porque cambian puntajes retroactivamente.
 
 ## Simulaciones
 
-`js/simulated-results.js` contiene resultados ficticios para desarrollo. El ranking usa esto solo si:
-1. `results_live` aún es `false`, O
-2. No hay datos en la tabla `results` de Supabase
+`js/simulated-results.js` contiene datos ficticios para desarrollo. Se usan solo si no hay datos reales en Supabase y `results_live = false`.
 
-Cuando los resultados reales estén cargados en Supabase, `simulated-results.js` se ignora.
+## Troubleshooting
+
+### "Error al guardar: Supabase error 401/403"
+
+Causas posibles:
+
+| Causa | Síntoma | Solución |
+|---|---|---|
+| RLS `array_length` con array vacío | 401 al enviar sin tags | `array_length(tags,1)` devuelve NULL para arrays vacíos. La policy debe usar `(array_length(tags,1) IS NULL OR array_length(tags,1) <= 5)` |
+| Answers demasiado grandes (>10KB) | 401 | Revisar que `octet_length(answers::text) <= 10240` en la policy |
+| Rate limit (>5 inserts/60s) | Error 429 | Esperar 60 segundos y reintentar |
+| Nombre de fantasía duplicado | 409 | Se muestra como "Ese nombre ya fue tomado" |
+
+Para diagnosticar:
+1. Revisar `console.error` en el browser (F12 > Console)
+2. Consultar `SELECT * FROM logs ORDER BY created_at DESC` en Supabase SQL Editor
+
+### Datos corruptos en localStorage
+
+Si la app falla al cargar, limpiar localStorage desde las DevTools (Application > Local Storage > Clear All) o abrir en una ventana de incógnito.
 
 ## Seguridad
 
-- **Rate limiting:** Las migraciones SQL incluyen un trigger que limita a 5 inserts por IP cada 60 segundos. Ya activo.
-- La `SUPABASE_ANON_KEY` está en el código fuente. Las RLS son la barrera real.
+- **Rate limiting:** Trigger que limita a 5 inserts por IP cada 60 segundos en `predictions`.
+- **RLS:** Las políticas de Row Level Security son la barrera real. La `SUPABASE_ANON_KEY` en el código es publishable.
+- **Input sanitization:** `escapeHtml()` en todos los inserts de datos de usuario.
