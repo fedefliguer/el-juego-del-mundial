@@ -901,6 +901,11 @@ select { cursor: pointer; appearance: auto; }
 .validation-modal-list li { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.95rem; line-height: 1.4; display: flex; align-items: flex-start; gap: 8px; }
 .validation-modal-list li:last-child { border-bottom: none; }
 .validation-modal-content .btn { width: 100%; padding: 12px; font-size: 1rem; }
+.validation-modal-content input[type="text"] { background: #1e293b; color: #f1f5f9; border: 1px solid #334155; border-radius: 8px; padding: 10px; font-size: 0.95rem; width: 100%; outline: none; }
+.validation-modal-content input[type="text"]:focus { border-color: var(--primary); }
+.validation-modal-content label { color: #94a3b8; font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 4px; }
+.validation-modal-content .btn--ghost { background: transparent; color: #94a3b8; border: 1px solid #334155; }
+.validation-modal-content .btn--ghost:hover { color: #f1f5f9; border-color: #64748b; }
 
 /* --- Detail grid inside modal --- */
 .detail-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }

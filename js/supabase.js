@@ -96,7 +96,7 @@ const supabase = {
   },
 
   // Guarda una predicción
-  async submit({ fantasyName, tags, answers }) {
+  async submit({ fantasyName, tags, answers, tournamentMeta }) {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/predictions`, {
       method: 'POST',
       headers: {
@@ -117,23 +117,71 @@ const supabase = {
       }
       throw new Error(`Supabase error ${res.status}: ${text}`);
     }
+    // Upsertar metadata de torneos nuevos/privados
+    if (tournamentMeta) {
+      const entries = Object.entries(tournamentMeta);
+      for (const [name, meta] of entries) {
+        await this.upsertTournament(name, meta.visibility, meta.inviteCode);
+      }
+    }
     return res;
   },
 
-  // Obtiene todos los tags existentes (para autocompletado)
-  async getTags() {
+  // Obtiene todos los torneos (para autocompletado)
+  async getTournaments() {
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_all_tags`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_tournaments`, {
         headers: {
           'apikey': SUPABASE_ANON_KEY,
           'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
         }
       });
       if (!res.ok) return [];
-      const data = await res.json();
-      return data.map(d => d.tag);
+      return await res.json();
     } catch {
       return [];
+    }
+  },
+
+  // Crea o actualiza un torneo (upsert por nombre)
+  async upsertTournament(name, visibility, inviteCode) {
+    const body = { name, visibility };
+    if (inviteCode) body.invite_code = inviteCode;
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/tournaments?on_conflict=name`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      console.warn('Tournament upsert warning:', text);
+    }
+  },
+
+  // Verifica código de invitación para torneo privado
+  async verifyInviteCode(tournamentName, code) {
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/rpc/verify_invite_code`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({ tournament_name: tournamentName, code })
+        }
+      );
+      if (!res.ok) return false;
+      return await res.json();
+    } catch {
+      return false;
     }
   }
 };

@@ -12,6 +12,8 @@ const PAGE_SIZE = 50;
 let rankingData = null;
 let rankingPage = 0;
 let resultsLive = false;
+let allTournaments = [];
+let verifiedCodes = new Set();
 
 async function loadRanking() {
   const container = $('results-body');
@@ -26,6 +28,13 @@ async function loadRanking() {
       container.innerHTML = '<p class="help-text" style="text-align:center;padding:40px;">Todavía no hay predicciones registradas.</p>';
       return;
     }
+
+    // Load tournaments + cached codes
+    allTournaments = await supabase.getTournaments();
+    try {
+      const stored = JSON.parse(sessionStorage.getItem('verified_codes') || '[]');
+      verifiedCodes = new Set(stored);
+    } catch (e) { verifiedCodes = new Set(); }
 
     let realResults = null;
     if (resultsLive) {
@@ -48,6 +57,16 @@ async function loadRanking() {
 
     rankingData.sort((a, b) => resultsLive ? b.total - a.total : a.fantasyName.localeCompare(b.fantasyName));
 
+    // If URL has ?tag=, check private access
+    const urlTag = new URLSearchParams(window.location.search).get('tag');
+    if (urlTag) {
+      const tourn = allTournaments.find(t => t.name === urlTag);
+      if (tourn && tourn.visibility === 'private' && !verifiedCodes.has(urlTag)) {
+        showPrivateRankingCodePrompt(urlTag);
+        return;
+      }
+    }
+
     renderGeneralRanking(rankingData);
   } catch (err) {
     container.innerHTML = '<p class="help-text" style="text-align:center;padding:40px;">Error al cargar datos.</p>';
@@ -57,9 +76,15 @@ async function loadRanking() {
 
 let currentRankingView = 'general';
 
+function publicTags() {
+  const allNames = [...new Set(rankingData.flatMap(d => d.tags))];
+  const publicNames = new Set(allTournaments.filter(t => t.visibility === 'public').map(t => t.name));
+  return allNames.filter(n => publicNames.has(n)).sort();
+}
+
 function renderGeneralRanking(data) {
   const container = $('results-body');
-  const allTags = [...new Set(data.flatMap(d => d.tags))].sort();
+  const allTags = publicTags();
   const count = data.length;
 
   let html = `
@@ -79,7 +104,8 @@ function renderGeneralRanking(data) {
 }
 
 function renderTable(data, allTags, view) {
-  const selectedTag = view === 'tag' ? (new URLSearchParams(window.location.search).get('tag') || allTags[0] || '') : null;
+  const urlTag = new URLSearchParams(window.location.search).get('tag');
+  const selectedTag = view === 'tag' ? (urlTag || allTags[0] || '') : null;
   const filtered = selectedTag ? data.filter(d => d.tags.includes(selectedTag)) : data;
   const sorted = view === 'tag' ? [...filtered].sort((a, b) => resultsLive ? b.total - a.total : a.fantasyName.localeCompare(b.fantasyName)) : data;
 
@@ -139,11 +165,49 @@ function renderTable(data, allTags, view) {
 
 function switchTag(tag) {
   currentRankingView = 'tag';
+  // Check if selected tag is private
+  if (tag) {
+    const tourn = allTournaments.find(t => t.name === tag);
+    if (tourn && tourn.visibility === 'private' && !verifiedCodes.has(tag)) {
+      showPrivateRankingCodePrompt(tag);
+      return;
+    }
+  }
   const url = new URL(window.location);
   if (tag) url.searchParams.set('tag', tag);
   else url.searchParams.delete('tag');
   window.history.replaceState({}, '', url);
   renderGeneralRanking(rankingData || []);
+}
+
+/* --- Private tournament code prompt in ranking --- */
+function showPrivateRankingCodePrompt(tag) {
+  const body = $('private-code-body');
+  body.innerHTML = `
+    <p style="margin-bottom:12px;">El torneo <strong>${escapeHtml(tag)}</strong> es privado. Ingresá el código de invitación para ver el ranking:</p>
+    <input type="text" id="private-code-input" maxlength="8" placeholder="Ej: ABC12" style="display:block;width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:12px;">
+    <div id="rank-code-error" style="color:var(--danger);font-size:0.85rem;margin-bottom:8px;display:none;">Código incorrecto</div>
+    <button class="btn btn--primary" style="width:100%;" onclick="confirmRankingCode()">Ingresar</button>`;
+  $('private-code-modal').classList.add('visible');
+}
+
+async function confirmRankingCode() {
+  const code = $('private-code-input').value.trim().toUpperCase();
+  if (!code) return;
+  const tag = new URLSearchParams(window.location.search).get('tag') || '';
+  const ok = await supabase.verifyInviteCode(tag, code);
+  if (ok) {
+    verifiedCodes.add(tag);
+    try { sessionStorage.setItem('verified_codes', JSON.stringify([...verifiedCodes])); } catch (e) { /* ignore */ }
+    hidePrivateCodeModal();
+    renderGeneralRanking(rankingData || []);
+  } else {
+    $('rank-code-error').style.display = 'block';
+  }
+}
+
+function hidePrivateCodeModal() {
+  $('private-code-modal').classList.remove('visible');
 }
 
 /* ---------- MODAL DE DETALLE ---------- */
@@ -192,7 +256,7 @@ function renderPredictionDetail(name, tags, answers) {
   const argOrder = ['dieciseisavos', 'octavos', 'cuartos', 'semis', 'final'];
 
   let html = `<h3 style="margin-bottom:4px;">${escapeHtml(name)}</h3>`;
-  if (tags.length) html += `<p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:16px;">🏷️ ${tags.map(t => escapeHtml(t)).join(', ')}</p>`;
+  if (tags.length) html += `<p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:16px;">🏆 ${tags.map(t => escapeHtml(t)).join(', ')}</p>`;
 
   html += '<div class="detail-grid">';
 

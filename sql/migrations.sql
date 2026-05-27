@@ -53,3 +53,46 @@ CREATE POLICY "anon_select_config" ON config
 DROP POLICY IF EXISTS anon_select_results ON results;
 CREATE POLICY anon_select_results ON results
   FOR SELECT TO anon USING (true);
+
+-- 6. Tabla de torneos (públicos / privados con código)
+CREATE TABLE IF NOT EXISTS tournaments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL,
+  visibility TEXT NOT NULL DEFAULT 'public' CHECK (visibility IN ('public', 'private')),
+  invite_code TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE tournaments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "anon_select_tournaments" ON tournaments
+  FOR SELECT TO anon USING (true);
+CREATE POLICY "anon_insert_tournaments" ON tournaments
+  FOR INSERT TO anon WITH CHECK (true);
+CREATE POLICY "anon_update_tournaments" ON tournaments
+  FOR UPDATE TO anon USING (true);
+
+-- Seedear torneos existentes desde predictions como públicos
+INSERT INTO tournaments (name, visibility)
+SELECT DISTINCT t.tag, 'public'
+FROM predictions p, LATERAL unnest(p.tags) AS t(tag)
+ON CONFLICT (name) DO NOTHING;
+
+-- Reemplazar get_all_tags con get_tournaments (incluye visibilidad)
+DROP FUNCTION IF EXISTS get_all_tags;
+CREATE OR REPLACE FUNCTION get_tournaments()
+RETURNS TABLE(name TEXT, visibility TEXT) LANGUAGE SQL STABLE AS $$
+  SELECT t.name, t.visibility FROM tournaments t ORDER BY t.name;
+$$;
+GRANT EXECUTE ON FUNCTION get_tournaments TO anon;
+
+-- Función para verificar código de invitación
+CREATE OR REPLACE FUNCTION verify_invite_code(tournament_name TEXT, code TEXT)
+RETURNS BOOLEAN LANGUAGE SQL STABLE AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM tournaments
+    WHERE name = tournament_name
+    AND visibility = 'private'
+    AND invite_code = code
+  );
+$$;
+GRANT EXECUTE ON FUNCTION verify_invite_code TO anon;

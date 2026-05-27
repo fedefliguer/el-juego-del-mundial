@@ -16,7 +16,8 @@ function saveState() {
       answers: state.answers,
       tags: state.tags,
       fantasyName: state.fantasyName,
-      step: state.step
+      step: state.step,
+      tournamentMeta: state.tournamentMeta
     }));
   } catch (e) { /* quota exceeded, ignore */ }
 }
@@ -30,6 +31,7 @@ function loadSavedState() {
     if (saved.tags) state.tags = saved.tags;
     if (saved.fantasyName) state.fantasyName = saved.fantasyName;
     if (saved.step !== undefined) state.step = saved.step;
+    if (saved.tournamentMeta) state.tournamentMeta = saved.tournamentMeta;
   } catch (e) { /* corrupt data, ignore */ }
 }
 
@@ -46,7 +48,8 @@ const state = {
     goleador: { player: '', goals: '' }
   },
   tags: [],
-  fantasyName: ''
+  fantasyName: '',
+  tournamentMeta: {}
 };
 
 const $ = id => document.getElementById(id);
@@ -482,23 +485,123 @@ function renderGoleador() {
     </div>`;
 }
 
-/* ---------- TAGS ---------- */
+/* ---------- TAGS / TORNEOS ---------- */
+function doAddTag(name) {
+  state.tags.push(name); renderTagsDOM(); validateFinal(); updateSubmitButton();
+  hideSuggestions(); saveState();
+}
+
 function addTag() {
   const inp = $('ff-tag-input');
   const v = inp.value.trim().replace(/^#/, '');
-  if (v && !state.tags.includes(v) && state.tags.length < 5) {
-    state.tags.push(v); inp.value = ''; renderTagsDOM(); validateFinal(); updateSubmitButton();
-    hideSuggestions(); saveState();
+  if (!v || state.tags.includes(v) || state.tags.length >= 5) return;
+  inp.value = '';
+
+  const existing = allTournaments.find(t => t.name === v);
+  if (existing) {
+    if (existing.visibility === 'public') {
+      doAddTag(v);
+    } else {
+      showPrivateTagCodePrompt(v);
+    }
+  } else {
+    showCreateTournamentModal(v);
   }
 }
+
 function renderTagsDOM() {
   const c = $('ff-tags-container');
   if (!c) return;
-  c.innerHTML = state.tags.length === 0 ? '' : state.tags.map(t => `<span class="tag">${escapeHtml(t)} <span class="tag-remove" data-tag="${escapeHtml(t)}">×</span></span>`).join('');
+  c.innerHTML = state.tags.length === 0 ? '' : state.tags.map(t => {
+    const isPrivate = state.tournamentMeta[t]?.visibility === 'private';
+    const icon = isPrivate ? '🔒 ' : '';
+    return `<span class="tag">${icon}${escapeHtml(t)} <span class="tag-remove" data-tag="${escapeHtml(t)}">×</span></span>`;
+  }).join('');
 }
+
 function removeTag(name) {
   state.tags = state.tags.filter(t => t !== name); renderTagsDOM(); validateFinal(); updateSubmitButton();
   saveState();
+}
+
+/* --- Create tournament modal --- */
+let pendingNewTag = '';
+
+function showCreateTournamentModal(name) {
+  pendingNewTag = name;
+  const body = $('create-tournament-body');
+  body.innerHTML = `
+    <p style="margin-bottom:16px;font-size:0.95rem;">Elegí cómo querés crear el torneo <strong>${escapeHtml(name)}</strong>:</p>
+    <button class="btn btn--primary" style="width:100%;margin-bottom:8px;" onclick="finishCreateTournament('public')">🌐 Público</button>
+    <button class="btn btn--ghost" style="width:100%;border:2px solid var(--border);" onclick="showPrivateTournamentForm()">🔒 Privado</button>
+    <div id="private-tournament-form" style="display:none;margin-top:12px;">
+      <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:4px;">Código de invitación</label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="new-invite-code" maxlength="8" placeholder="Ej: ABC123" style="flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;">
+        <button class="btn btn--ghost" onclick="generateInviteCode()">🎲</button>
+      </div>
+      <button class="btn btn--primary" style="width:100%;margin-top:8px;" onclick="finishCreateTournament('private')">Confirmar torneo privado</button>
+    </div>`;
+  $('create-tournament-modal').classList.add('visible');
+}
+
+function showPrivateTournamentForm() {
+  $('private-tournament-form').style.display = 'block';
+}
+
+function generateInviteCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 5; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  $('new-invite-code').value = code;
+}
+
+function finishCreateTournament(visibility) {
+  const name = pendingNewTag;
+  pendingNewTag = '';
+  let inviteCode = '';
+  if (visibility === 'private') {
+    inviteCode = $('new-invite-code').value.trim().toUpperCase();
+    if (!inviteCode || inviteCode.length < 3) { alert('Elegí o generá un código de al menos 3 caracteres.'); return; }
+  }
+  state.tournamentMeta[name] = { visibility, inviteCode };
+  hideCreateTournamentModal();
+  doAddTag(name);
+}
+
+function hideCreateTournamentModal() {
+  $('create-tournament-modal').classList.remove('visible');
+}
+
+/* --- Private tag code prompt --- */
+function showPrivateTagCodePrompt(name) {
+  pendingNewTag = name;
+  const body = $('private-code-body');
+  body.innerHTML = `
+    <p style="margin-bottom:12px;">El torneo <strong>${escapeHtml(name)}</strong> es privado. Ingresá el código de invitación:</p>
+    <input type="text" id="private-code-input" maxlength="8" placeholder="Ej: ABC12" style="display:block;width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:12px;">
+    <div id="private-code-error" style="color:var(--danger);font-size:0.85rem;margin-bottom:8px;display:none;">Código incorrecto</div>
+    <button class="btn btn--primary" style="width:100%;" onclick="confirmPrivateTagCode()">Ingresar</button>`;
+  $('private-code-modal').classList.add('visible');
+}
+
+async function confirmPrivateTagCode() {
+  const code = $('private-code-input').value.trim().toUpperCase();
+  if (!code) return;
+  const name = pendingNewTag;
+  const ok = await supabase.verifyInviteCode(name, code);
+  if (ok) {
+    state.tournamentMeta[name] = { visibility: 'private', inviteCode: code };
+    pendingNewTag = '';
+    hidePrivateCodeModal();
+    doAddTag(name);
+  } else {
+    $('private-code-error').style.display = 'block';
+  }
+}
+
+function hidePrivateCodeModal() {
+  $('private-code-modal').classList.remove('visible');
 }
 
 /* ---------- SUMMARY ---------- */
@@ -570,7 +673,7 @@ function renderSummary() {
 }
 
 /* ---------- FINAL SCREEN ---------- */
-let allExistingTags = [];
+let allTournaments = [];
 let tagAutocompleteTimer = null;
 
 function renderFinalScreen() {
@@ -584,10 +687,10 @@ function renderFinalScreen() {
       </details>
     </div>
     <div class="final-section"><h3>🏷️ Nombre de fantasía</h3>
-      <input type="text" id="ff-name" placeholder="Ej: MessiFan2014" maxlength="30" value="${escapeHtml(state.fantasyName)}">
+      <input type="text" id="ff-name" placeholder="Ej: AldoParedes" maxlength="30" value="${escapeHtml(state.fantasyName)}">
       <div id="ff-name-status" class="help-text">Debe ser único. Se valida al enviar.</div></div>
-    <div class="final-section"><h3>🔖 Tags (máx. 5)</h3>
-      <p class="help-text">Los tags te permiten filtrar torneos entre amigos. Escribí y elegí uno existente o creá uno nuevo.</p>
+    <div class="final-section"><h3>🏆 Torneos (máx. 5)</h3>
+      <p class="help-text">Los torneos te permiten agruparte con amigos. Escribí y elegí uno existente o creá uno nuevo.</p>
       <div id="ff-tag-wrapper" class="tag-input-wrapper" style="position:relative;">
         <input type="text" id="ff-tag-input" placeholder="Ej: argentina" maxlength="20" autocomplete="off">
         <button class="btn btn--primary" id="ff-tag-add">+</button>
@@ -631,8 +734,8 @@ function renderFinalScreen() {
   });
   tagInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addTag(); hideSuggestions(); } });
   tagAdd.addEventListener('click', () => { addTag(); hideSuggestions(); });
-  // Load existing tags for autocomplete
-  supabase.getTags().then(tags => { allExistingTags = tags; });
+  // Load existing tournaments for autocomplete
+  supabase.getTournaments().then(tournaments => { allTournaments = tournaments; });
 
   // Autocomplete on input
   tagInput.addEventListener('input', () => {
@@ -654,21 +757,21 @@ function showTagSuggestions(query) {
   if (!wrap || !query) { wrap.innerHTML = ''; wrap.classList.remove('visible'); return; }
 
   const lower = query.toLowerCase();
-  const matches = allExistingTags.filter(t => t.toLowerCase().includes(lower)).slice(0, 8);
-  const exactMatch = matches.some(t => t.toLowerCase() === lower);
+  const matches = allTournaments.filter(t => t.name.toLowerCase().includes(lower)).slice(0, 8);
+  const exactMatch = matches.some(t => t.name.toLowerCase() === lower);
+  const alreadyAdded = state.tags.includes(query);
   let html = '';
 
   matches.forEach(t => {
-    const idx = t.toLowerCase().indexOf(lower);
-    const before = escapeHtml(t.slice(0, idx));
-    const match = escapeHtml(t.slice(idx, idx + query.length));
-    const after = escapeHtml(t.slice(idx + query.length));
-    html += `<div class="tag-suggestion" data-tag="${escapeHtml(t)}">${before}<strong>${match}</strong>${after}</div>`;
+    const idx = t.name.toLowerCase().indexOf(lower);
+    const before = escapeHtml(t.name.slice(0, idx));
+    const match = escapeHtml(t.name.slice(idx, idx + query.length));
+    const after = escapeHtml(t.name.slice(idx + query.length));
+    const lock = t.visibility === 'private' ? '🔒 ' : '';
+    html += `<div class="tag-suggestion" data-tag="${escapeHtml(t.name)}">${lock}${before}<strong>${match}</strong>${after}</div>`;
   });
 
-  if (matches.length === 0) {
-    html += `<div class="tag-suggestion tag-suggestion--new" data-tag="${escapeHtml(query)}">🏁 Crear torneo <strong>${escapeHtml(query)}</strong></div>`;
-  } else if (!exactMatch) {
+  if (!exactMatch && !alreadyAdded) {
     html += `<div class="tag-suggestion tag-suggestion--new" data-tag="${escapeHtml(query)}">🏁 Crear torneo <strong>${escapeHtml(query)}</strong></div>`;
   }
 
@@ -902,7 +1005,7 @@ async function handleSubmit() {
   btn.disabled = true; btn.classList.add('btn--loading');
 
   try {
-    await supabase.submit({ fantasyName: state.fantasyName, tags: state.tags, answers: state.answers });
+    await supabase.submit({ fantasyName: state.fantasyName, tags: state.tags, answers: state.answers, tournamentMeta: state.tournamentMeta });
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
     showScreen('done');
     $('done-name').textContent = `Registrado como "${state.fantasyName}".`;
