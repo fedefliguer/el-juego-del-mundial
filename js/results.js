@@ -199,14 +199,9 @@ async function confirmRankingCode() {
   if (ok) {
     verifiedCodes.add(tag);
     try { sessionStorage.setItem('verified_codes', JSON.stringify([...verifiedCodes])); } catch (e) { /* ignore */ }
-    hidePrivateCodeModal();
-    renderGeneralRanking(rankingData || []);
-  } else {
-    $('rank-code-error').style.display = 'block';
-  }
-}
+    hidePrivateModal();
 
-function hidePrivateCodeModal() {
+function hidePrivateModal() {
   $('private-code-modal').classList.remove('visible');
 }
 

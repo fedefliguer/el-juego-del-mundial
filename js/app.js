@@ -524,58 +524,58 @@ function removeTag(name) {
   saveState();
 }
 
-/* --- New tag picker (inline) --- */
+/* --- Create tournament modal --- */
 function showNewTagPicker(name) {
-  const wrap = $('ff-tag-suggestions');
-  if (!wrap) return;
-  wrap.innerHTML = `
-    <div class="new-tag-picker">
-      <div class="picker-title">Nuevo torneo: <strong>${escapeHtml(name)}</strong></div>
-      <div class="vis-toggle">
-        <button class="vis-opt active" data-vis="public">🌐 Público</button>
-        <button class="vis-opt" data-vis="private">🔒 Privado</button>
-      </div>
-      <div id="picker-code-wrap" class="picker-code-wrap" style="display:none;">
-        <input type="text" id="picker-code" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Código numérico (ej: 1234)">
-      </div>
-      <button class="btn btn--primary picker-add" id="picker-add">Agregar torneo</button>
-    </div>`;
-  wrap.classList.add('visible');
+  const body = $('create-tournament-body');
+  body.innerHTML = `
+    <p style="margin-bottom:14px;">Elegí cómo querés crear el torneo <strong>${escapeHtml(name)}</strong>:</p>
+    <div class="vis-toggle">
+      <button class="vis-opt active" data-vis="public">🌐 Público</button>
+      <button class="vis-opt" data-vis="private">🔒 Privado</button>
+    </div>
+    <div id="modal-code-wrap" style="display:none;margin-top:10px;">
+      <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:4px;">Código de invitación</label>
+      <input type="text" id="modal-invite-code" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Ej: 1234" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:1rem;text-align:center;letter-spacing:3px;">
+    </div>
+    <button class="btn btn--primary" style="width:100%;margin-top:14px;" id="modal-confirm-tag">Crear torneo</button>`;
+  $('create-tournament-modal').classList.add('visible');
 
-  wrap.querySelectorAll('.vis-opt').forEach(b => {
+  // Toggle público/privado
+  body.querySelectorAll('.vis-opt').forEach(b => {
     b.addEventListener('click', () => {
-      wrap.querySelectorAll('.vis-opt').forEach(x => x.classList.remove('active'));
+      body.querySelectorAll('.vis-opt').forEach(x => x.classList.remove('active'));
       b.classList.add('active');
-      const cw = $('picker-code-wrap');
-      cw.style.display = b.dataset.vis === 'private' ? 'block' : 'none';
+      $('modal-code-wrap').style.display = b.dataset.vis === 'private' ? 'block' : 'none';
     });
   });
 
-  $('picker-add').addEventListener('click', () => {
-    const vis = wrap.querySelector('.vis-opt.active').dataset.vis;
+  // Confirm
+  $('modal-confirm-tag').addEventListener('click', () => {
+    const vis = body.querySelector('.vis-opt.active').dataset.vis;
     let code = '';
     if (vis === 'private') {
-      code = $('picker-code').value.trim();
+      code = $('modal-invite-code').value.trim();
       if (!code || code.length < 3) { showToast('El código debe tener al menos 3 dígitos.'); return; }
     }
     state.tournamentMeta[name] = { visibility: vis, inviteCode: code };
+    hideCreateModal();
     doAddTag(name);
   });
 }
 
+function hideCreateModal() {
+  $('create-tournament-modal').classList.remove('visible');
+}
+
 /* --- Private tag code prompt (join existing) --- */
 function showPrivateTagCodePrompt(name) {
-  const wrap = $('ff-tag-suggestions');
-  if (!wrap) return;
-  wrap.innerHTML = `
-    <div class="new-tag-picker">
-      <div class="picker-title">🔒 Torneo privado: <strong>${escapeHtml(name)}</strong></div>
-      <div style="margin:8px 0;font-size:0.85rem;color:var(--text-muted);">Ingresá el código de invitación:</div>
-      <input type="text" id="priv-code-input" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Código numérico" style="display:block;width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;">
-      <div id="priv-code-error" style="color:var(--danger);font-size:0.85rem;margin-bottom:8px;display:none;">Código incorrecto</div>
-      <button class="btn btn--primary picker-add" id="priv-code-confirm">Ingresar</button>
-    </div>`;
-  wrap.classList.add('visible');
+  const body = $('private-code-body');
+  body.innerHTML = `
+    <p style="margin-bottom:12px;">El torneo <strong>${escapeHtml(name)}</strong> es privado. Ingresá el código de invitación:</p>
+    <input type="text" id="priv-code-input" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Código numérico" style="display:block;width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;">
+    <div id="priv-code-error" style="color:var(--danger);font-size:0.85rem;margin-bottom:8px;display:none;">Código incorrecto</div>
+    <button class="btn btn--primary" style="width:100%;" id="priv-code-confirm">Ingresar</button>`;
+  $('private-code-modal').classList.add('visible');
 
   $('priv-code-confirm').addEventListener('click', async () => {
     const code = $('priv-code-input').value.trim();
@@ -583,12 +583,16 @@ function showPrivateTagCodePrompt(name) {
     const ok = await supabase.verifyInviteCode(name, code);
     if (ok) {
       state.tournamentMeta[name] = { visibility: 'private', inviteCode: code };
-      hideSuggestions();
+      hidePrivateModal();
       doAddTag(name);
     } else {
       $('priv-code-error').style.display = 'block';
     }
   });
+}
+
+function hidePrivateModal() {
+  $('private-code-modal').classList.remove('visible');
 }
 
 /* ---------- SUMMARY ---------- */

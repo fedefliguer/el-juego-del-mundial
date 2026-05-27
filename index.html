@@ -141,11 +141,19 @@
       <button class="btn btn--primary" onclick="hideValidationModal()">Entendido</button>
     </div>
   </div>
-  <div id="private-code-modal" class="validation-overlay" onclick="if (event.target === this) hidePrivateCodeModal()">
+  <div id="create-tournament-modal" class="validation-overlay" onclick="if (event.target === this) hideCreateModal()">
+    <div class="validation-modal-content">
+      <h3>🏁 Nuevo torneo</h3>
+      <div id="create-tournament-body"></div>
+      <button class="btn btn--ghost" style="width:100%;margin-top:8px;" onclick="hideCreateModal()">Cancelar</button>
+    </div>
+  </div>
+
+  <div id="private-code-modal" class="validation-overlay" onclick="if (event.target === this) hidePrivateModal()">
     <div class="validation-modal-content">
       <h3>🔒 Torneo privado</h3>
       <div id="private-code-body"></div>
-      <button class="btn btn--ghost" style="width:100%;margin-top:8px;" onclick="hidePrivateCodeModal()">Cancelar</button>
+      <button class="btn btn--ghost" style="width:100%;margin-top:8px;" onclick="hidePrivateModal()">Cancelar</button>
     </div>
   </div>
 
