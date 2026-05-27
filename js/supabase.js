@@ -163,6 +163,23 @@ const supabase = {
     }
   },
 
+  // Loguea un error en el servidor
+  async logError(message, details) {
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/rpc/log_error`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({ p_message: message, p_details: details || {} })
+      });
+    } catch (e) {
+      console.warn('Failed to log error:', e);
+    }
+  },
+
   // Verifica código de invitación para torneo privado
   async verifyInviteCode(tournamentName, code) {
     try {

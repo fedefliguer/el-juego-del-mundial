@@ -96,3 +96,23 @@ RETURNS BOOLEAN LANGUAGE SQL STABLE AS $$
   );
 $$;
 GRANT EXECUTE ON FUNCTION verify_invite_code TO anon;
+
+-- 7. Logs table para errores del lado del servidor
+CREATE TABLE IF NOT EXISTS logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  level TEXT NOT NULL DEFAULT 'error',
+  message TEXT NOT NULL,
+  details JSONB,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "anon_insert_logs" ON logs
+  FOR INSERT TO anon WITH CHECK (true);
+
+-- Función RPC para loguear errores desde el frontend
+CREATE OR REPLACE FUNCTION log_error(p_message TEXT, p_details JSONB DEFAULT NULL)
+RETURNS void LANGUAGE SQL AS $$
+  INSERT INTO logs (level, message, details) VALUES ('error', p_message, p_details);
+$$;
+GRANT EXECUTE ON FUNCTION log_error TO anon;

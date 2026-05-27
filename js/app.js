@@ -362,12 +362,14 @@ function renderNonChampions() {
         </div>
       </div>`;
     } else {
+      const selectedTeams = saved.filter((n, j) => j !== i && n.team).map(n => n.team);
+      const available = nt.filter(t => !selectedTeams.includes(t));
       html += `<div class="champ-row">
-        ${renderSelect(nt, s.team, `nonChamps.${i}.team`, `Equipo #${i+1}`)}
+        ${renderSelect(available, s.team, `nonChamps.${i}.team`, `Equipo #${i+1}`)}
       </div>`;
     }
   }
-  return html + '</div><p class="help-text" style="margin-top:8px;">Tip: Se puede apostar dos o tres veces al mismo país, y por cada una sumás los puntos.</p>';
+  return html + '</div>';
 }
 
 /* --- ARGENTINA PATH --- */
@@ -451,7 +453,7 @@ function renderFinal() {
     </div>
 
     <div class="score-row">
-      <div class="score-label" style="grid-column:1/-1;margin-bottom:4px;">Resultado 90' (o 120' si hay alargue)</div>
+      <div class="score-label" style="grid-column:1/-1;margin-bottom:4px;">Resultado del partido (incluyendo el eventual alargue)</div>
       <div class="score-group">
         <div class="score-stepper">
           <button class="stepper-btn" data-action="score-step" data-field="score1" data-dir="dec">−</button>
@@ -483,7 +485,7 @@ function renderFinal() {
 /* --- GOLEADOR --- */
 function renderGoleador() {
   const g = state.answers.goleador;
-  const goals = g.goals !== '' ? parseInt(g.goals) : 0;
+  const goals = g.goals !== '' ? parseInt(g.goals) : 1;
   return `
     <div class="form-group">
       <label>Jugador</label>
@@ -494,7 +496,7 @@ function renderGoleador() {
       <label>Cantidad de goles</label>
       <div class="score-stepper" style="justify-content:flex-start;gap:16px;">
         <button class="stepper-btn" data-action="score-step" data-field="goals-player" data-dir="dec">−</button>
-        <span class="stepper-val">${goals}</span>
+        <input type="number" class="stepper-val-input" data-field="goleador.goals" min="1" max="30" value="${goals}">
         <button class="stepper-btn" data-action="score-step" data-field="goals-player" data-dir="inc">+</button>
       </div>
     </div>`;
@@ -589,7 +591,10 @@ function showPrivateTagCodePrompt(name) {
     <p style="margin-bottom:12px;">El torneo <strong>${escapeHtml(name)}</strong> es privado. Ingresá el código de invitación:</p>
     <input type="text" id="priv-code-input" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Código numérico" style="display:block;width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;">
     <div id="priv-code-error" style="color:var(--danger);font-size:0.85rem;margin-bottom:8px;display:none;">Código incorrecto</div>
-    <button class="btn btn--primary" style="width:100%;" id="priv-code-confirm">Ingresar</button>`;
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn--primary" style="flex:1;" id="priv-code-confirm">Ingresar</button>
+      <button class="btn btn--primary" style="flex:1;" onclick="hidePrivateModal()">Cancelar</button>
+    </div>`;
   $('private-code-modal').classList.add('visible');
 
   $('priv-code-confirm').addEventListener('click', async () => {
@@ -803,6 +808,13 @@ function handleFieldChange(target) {
   for (let i = 0; i < parts.length - 1; i++) { if (!obj[parts[i]]) obj[parts[i]] = {}; obj = obj[parts[i]]; }
   obj[parts[parts.length - 1]] = target.value;
 
+  if (field === 'goleador.goals') {
+    const v = parseInt(target.value);
+    if (isNaN(v) || v < 1) { obj[parts[parts.length - 1]] = '1'; target.value = '1'; }
+    else if (v > 30) { obj[parts[parts.length - 1]] = '30'; target.value = '30'; }
+    else { obj[parts[parts.length - 1]] = String(v); target.value = String(v); }
+  }
+
   if (parts[0] === 'groups') {
     const g = parts[1], pos = parts[2], team = target.value;
     const other = pos === 'first' ? 'second' : 'first';
@@ -897,8 +909,8 @@ function handleAction(target) {
     const field = target.dataset.field;
     const dir = target.dataset.dir;
     if (field === 'goals-player') {
-      const cur = parseInt(state.answers.goleador.goals || 0);
-      state.answers.goleador.goals = String(Math.max(0, Math.min(30, cur + (dir === 'inc' ? 1 : -1))));
+      const cur = parseInt(state.answers.goleador.goals || 1);
+      state.answers.goleador.goals = String(Math.max(1, Math.min(30, cur + (dir === 'inc' ? 1 : -1))));
     } else {
       const cur = parseInt(state.answers.final[field] || 0);
       state.answers.final[field] = String(Math.max(0, Math.min(15, cur + (dir === 'inc' ? 1 : -1))));
@@ -935,35 +947,35 @@ function missingSteps() {
         const s = state.answers.groups[g];
         return !s || !s.first || !s.second || s.first === s.second;
       });
-      details.push(`${step.title}: falta ${miss.join(', ')}`);
+      details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta ${miss.join(', ')}`);
     } else if (t === 'champions') {
       const miss = CHAMPIONS.filter(c => !state.answers.champions[c]);
-      details.push(`${step.title}: falta ${miss.join(', ')}`);
+      details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta ${miss.join(', ')}`);
     } else if (t === 'non_champions') {
       const n = state.answers.nonChamps.filter(n => !n.team || !n.stage).length;
-      details.push(`${step.title}: faltan ${n} equipo(s)`);
+      details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: faltan ${n} equipo(s)`);
     } else if (t === 'argentina') {
       const a = state.answers.argentina;
-      if (!a.grupo) details.push(`${step.title}: falta posición en el grupo`);
+      if (!a.grupo) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta posición en el grupo`);
       else if (parseInt(a.grupo) < 3 && !a.plantarse) {
         const miss = ['dieciseisavos','octavos','cuartos','semis','final'].filter(s => !a.rivales?.[s]);
-        if (miss.length) details.push(`${step.title}: falta rival en ${miss.join(', ')}`);
+        if (miss.length) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta rival en ${miss.join(', ')}`);
       }
     } else if (t === 'primera_vez') {
-      if (!state.answers.dobleCamiseta.team) details.push(`${step.title}: falta elegir debutante`);
-      else if (!state.answers.dobleCamiseta.mode) details.push(`${step.title}: falta elegir único o compartido`);
+      if (!state.answers.dobleCamiseta.team) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta elegir debutante`);
+      else if (!state.answers.dobleCamiseta.mode) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta elegir único o compartido`);
     } else if (t === 'final') {
       const f = state.answers.final;
-      if (!f.team1) details.push(`${step.title}: falta Finalista A`);
-      else if (!f.team2) details.push(`${step.title}: falta Finalista B`);
-      else if (f.team1 === f.team2) details.push(`${step.title}: los finalistas deben ser distintos`);
-      else if (f.score1 === '' || f.score2 === '') details.push(`${step.title}: falta resultado`);
-      else if (!f.champion) details.push(`${step.title}: falta elegir campeón`);
+      if (!f.team1) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta Finalista A`);
+      else if (!f.team2) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta Finalista B`);
+      else if (f.team1 === f.team2) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: los finalistas deben ser distintos`);
+      else if (f.score1 === '' || f.score2 === '') details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta resultado`);
+      else if (!f.champion) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta elegir campeón`);
     } else if (t === 'goleador') {
-      if (!state.answers.goleador.player) details.push(`${step.title}: falta elegir jugador`);
-      else if (state.answers.goleador.goals === '') details.push(`${step.title}: falta cantidad de goles`);
+      if (!state.answers.goleador.player) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta elegir jugador`);
+      else if (state.answers.goleador.goals === '') details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta cantidad de goles`);
     } else {
-      details.push(step.title);
+      details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>`);
     }
   });
   return details;
@@ -989,7 +1001,7 @@ function nextStep() {
 function showValidationModal() {
   const miss = missingSteps();
   const body = $('validation-body');
-  body.innerHTML = miss.map(m => `<li>⚠️ ${escapeHtml(m)}</li>`).join('');
+  body.innerHTML = miss.map(m => `<li>⚠️ ${m}</li>`).join('');
   $('validation-modal').classList.add('visible');
 }
 
@@ -1018,8 +1030,9 @@ async function handleSubmit() {
     if (err.message === 'duplicate_name') {
       showToast('❌ Ese nombre ya fue tomado. Elegí otro.');
     } else {
-      showToast('Error al guardar.');
+      showToast(`❌ Error al guardar: ${err.message}`);
       console.error(err);
+      supabase.logError(`Submit failed: ${state.fantasyName}`, { error: err.message, tags: state.tags });
     }
     btn.disabled = false; btn.classList.remove('btn--loading');
   }
