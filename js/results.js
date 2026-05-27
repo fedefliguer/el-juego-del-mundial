@@ -13,7 +13,6 @@ let rankingData = null;
 let rankingPage = 0;
 let resultsLive = false;
 let allTournaments = [];
-let verifiedCodes = new Set();
 
 async function loadRanking() {
   const container = $('results-body');
@@ -29,12 +28,8 @@ async function loadRanking() {
       return;
     }
 
-    // Load tournaments + cached codes
+    // Load tournaments for filter
     allTournaments = await supabase.getTournaments();
-    try {
-      const stored = JSON.parse(sessionStorage.getItem('verified_codes') || '[]');
-      verifiedCodes = new Set(stored);
-    } catch (e) { verifiedCodes = new Set(); }
 
     let realResults = null;
     if (resultsLive) {
@@ -56,16 +51,6 @@ async function loadRanking() {
     });
 
     rankingData.sort((a, b) => resultsLive ? b.total - a.total : a.fantasyName.localeCompare(b.fantasyName));
-
-    // If URL has ?tag=, check private access
-    const urlTag = new URLSearchParams(window.location.search).get('tag');
-    if (urlTag) {
-      const tourn = allTournaments.find(t => t.name === urlTag);
-      if (tourn && tourn.visibility === 'private' && !verifiedCodes.has(urlTag)) {
-        showPrivateRankingCodePrompt(urlTag);
-        return;
-      }
-    }
 
     renderGeneralRanking(rankingData);
   } catch (err) {
@@ -127,8 +112,7 @@ function renderTable(data, allTags, view) {
       <select id="tag-filter-select" onchange="switchTag(this.value)">
         <option value="">— Todos —</option>
         ${allTags.map(t => {
-          const label = t.visibility === 'private' ? '🔒 ' + t.name : t.name;
-          return `<option value="${escapeHtml(t.name)}" ${t.name === selectedTag ? 'selected' : ''}>${escapeHtml(label)}</option>`;
+          return `<option value="${escapeHtml(t.name)}" ${t.name === selectedTag ? 'selected' : ''}>${escapeHtml(t.name)}</option>`;
         }).join('')}
       </select></div>`;
   }
@@ -172,49 +156,11 @@ function renderTable(data, allTags, view) {
 
 function switchTag(tag) {
   currentRankingView = 'tag';
-  // Check if selected tag is private
-  if (tag) {
-    const tourn = allTournaments.find(t => t.name === tag);
-    if (tourn && tourn.visibility === 'private' && !verifiedCodes.has(tag)) {
-      showPrivateRankingCodePrompt(tag);
-      return;
-    }
-  }
   const url = new URL(window.location);
   if (tag) url.searchParams.set('tag', tag);
   else url.searchParams.delete('tag');
   window.history.replaceState({}, '', url);
   renderGeneralRanking(rankingData || []);
-}
-
-/* --- Private tournament code prompt in ranking --- */
-function showPrivateRankingCodePrompt(tag) {
-  const body = $('private-code-body');
-  body.innerHTML = `
-    <p style="margin-bottom:12px;">El torneo <strong>${escapeHtml(tag)}</strong> es privado. Ingresá el código de invitación para ver el ranking:</p>
-    <input type="text" id="private-code-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="Ej: 1234" style="display:block;width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:12px;">
-    <div id="rank-code-error" style="color:var(--danger);font-size:0.85rem;margin-bottom:8px;display:none;">Código incorrecto</div>
-    <button class="btn btn--primary" style="width:100%;" onclick="confirmRankingCode()">Ingresar</button>`;
-  $('private-code-modal').classList.add('visible');
-}
-
-async function confirmRankingCode() {
-  const code = $('private-code-input').value.trim();
-  if (!code) return;
-  const tag = new URLSearchParams(window.location.search).get('tag') || '';
-  const ok = await supabase.verifyInviteCode(tag, code);
-  if (ok) {
-    verifiedCodes.add(tag);
-    try { sessionStorage.setItem('verified_codes', JSON.stringify([...verifiedCodes])); } catch (e) { /* ignore */ }
-    hidePrivateModal();
-    switchTag(tag);
-  } else {
-    $('rank-code-error').style.display = 'block';
-  }
-}
-
-function hidePrivateModal() {
-  $('private-code-modal').classList.remove('visible');
 }
 
 /* ---------- MODAL DE DETALLE ---------- */

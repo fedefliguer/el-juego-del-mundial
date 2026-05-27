@@ -167,19 +167,12 @@ const supabase = {
   async verifyInviteCode(tournamentName, code) {
     try {
       const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/rpc/verify_invite_code`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-          },
-          body: JSON.stringify({ tournament_name: tournamentName, code })
-        }
+        `${SUPABASE_URL}/rest/v1/tournaments?name=eq.${encodeURIComponent(tournamentName)}&visibility=eq.private&invite_code=eq.${encodeURIComponent(code)}&select=id`,
+        { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
       );
       if (!res.ok) return false;
-      return await res.json();
+      const data = await res.json();
+      return data.length > 0;
     } catch {
       return false;
     }
