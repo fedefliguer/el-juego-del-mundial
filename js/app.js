@@ -307,7 +307,7 @@ const STAGE_PILLS = [
   { value: 'dieciseisavos', label: '16avos'   },
   { value: 'octavos',       label: 'Octavos'  },
   { value: 'cuartos',       label: 'Cuartos'  },
-  { value: 'tercero',       label: '3° Puesto'},
+  { value: 'tercero',       label: '3° y 4° Puesto'},
   { value: 'final',         label: 'Final'    },
 ];
 
@@ -376,10 +376,11 @@ function renderArgentina() {
       html += `<div class="arg-step done"><h4>${labels[s]}</h4><span class="planted-badge">✅ Te plantaste acá</span><button class="btn-change" data-action="unplantar" data-stage="${s}">✎</button></div>`;
     } else {
       const filled = a.rivales[s];
+      const allPrevFilled = i === 0 || order.slice(0, i).every(p => a.rivales[p]);
       html += `<div class="arg-step${filled ? ' done' : ''}">
         <h4>${labels[s]}</h4>
         ${renderSelect(na, a.rivales[s] || '', `argentina.rivales.${s}`, 'Rival')}
-        <button class="btn btn--ghost plant-btn" data-action="plantar" data-stage="${s}" ${filled ? 'disabled' : ''}>🛑 Plantarme acá</button>
+        <button class="btn btn--ghost plant-btn" data-action="plantar" data-stage="${s}" ${allPrevFilled ? '' : 'disabled'}>🛑 Plantarme acá</button>
       </div>`;
     }
   });
@@ -819,7 +820,47 @@ function handleAction(target) {
 }
 
 function missingSteps() {
-  return STEPS.filter((_, i) => !isStepComplete(i)).map(s => s.title);
+  const details = [];
+  STEPS.forEach((step, i) => {
+    if (isStepComplete(i)) return;
+    const t = step.type || 'groups';
+    if (t === 'groups') {
+      const miss = ['A','B','C','D','E','F','G','H','I','J','K','L'].filter(g => {
+        const s = state.answers.groups[g];
+        return !s || !s.first || !s.second || s.first === s.second;
+      });
+      details.push(`${step.title}: falta ${miss.join(', ')}`);
+    } else if (t === 'champions') {
+      const miss = CHAMPIONS.filter(c => !state.answers.champions[c]);
+      details.push(`${step.title}: falta ${miss.join(', ')}`);
+    } else if (t === 'non_champions') {
+      const n = state.answers.nonChamps.filter(n => !n.team || !n.stage).length;
+      details.push(`${step.title}: faltan ${n} equipo(s)`);
+    } else if (t === 'argentina') {
+      const a = state.answers.argentina;
+      if (!a.grupo) details.push(`${step.title}: falta posición en el grupo`);
+      else if (parseInt(a.grupo) < 3 && !a.plantarse) {
+        const miss = ['dieciseisavos','octavos','cuartos','semis','final'].filter(s => !a.rivales?.[s]);
+        if (miss.length) details.push(`${step.title}: falta rival en ${miss.join(', ')}`);
+      }
+    } else if (t === 'primera_vez') {
+      if (!state.answers.dobleCamiseta.team) details.push(`${step.title}: falta elegir debutante`);
+      else if (!state.answers.dobleCamiseta.mode) details.push(`${step.title}: falta elegir único o compartido`);
+    } else if (t === 'final') {
+      const f = state.answers.final;
+      if (!f.team1) details.push(`${step.title}: falta Finalista A`);
+      else if (!f.team2) details.push(`${step.title}: falta Finalista B`);
+      else if (f.team1 === f.team2) details.push(`${step.title}: los finalistas deben ser distintos`);
+      else if (f.score1 === '' || f.score2 === '') details.push(`${step.title}: falta resultado`);
+      else if (!f.champion) details.push(`${step.title}: falta elegir campeón`);
+    } else if (t === 'goleador') {
+      if (!state.answers.goleador.player) details.push(`${step.title}: falta elegir jugador`);
+      else if (state.answers.goleador.goals === '') details.push(`${step.title}: falta cantidad de goles`);
+    } else {
+      details.push(step.title);
+    }
+  });
+  return details;
 }
 
 /* ---------- NAVIGATION ---------- */
@@ -833,7 +874,7 @@ function nextStep() {
   if (state.step < STEPS.length - 1) { goToStep(state.step + 1); return; }
   if (!allStepsComplete()) {
     const miss = missingSteps();
-    showToast(`Falta: ${miss.join(', ')}`);
+    showToast(`❌ ${miss.join(' · ')}`);
     return;
   }
   showScreen('final');
