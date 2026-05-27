@@ -79,6 +79,15 @@ Todo deployado y funcionando en https://el-juego-del-mundial.vercel.app
 4. Done (confirmación, sin share link)
 5. Resultados: ranking general o por torneo
 
+## Workflow
+
+Siempre que se haga un cambio en el código, hay que commitear, pushear y deployar:
+
+```bash
+git add -A && git commit -m "mensaje" && git push
+npx vercel --prod
+```
+
 ## Comandos útiles
 
 ```bash

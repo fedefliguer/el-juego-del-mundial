@@ -272,12 +272,12 @@ function renderCurrentStep() {
   if (resetBtn) resetBtn.addEventListener('click', resetAll);
 
   btnBack.style.visibility = state.step === 0 ? 'hidden' : 'visible';
+  updateNavButtons();
 }
 
 function updateNavButtons() {
-  const done = allStepsComplete();
-  btnNext.textContent = state.step < STEPS.length - 1 ? 'Siguiente →' : (done ? 'Finalizar ✦' : 'Faltan pasos ⚠️');
-  btnNext.disabled = !isStepComplete(state.step);
+  btnNext.textContent = state.step < STEPS.length - 1 ? 'Siguiente →' : 'Finalizar';
+  btnNext.disabled = false;
 }
 
 /* --- GROUPS (clickable buttons) --- */
@@ -682,7 +682,6 @@ function hideSuggestions() {
 }
 
 /* ---------- VALIDATION ---------- */
-function validateStep() { btnNext.disabled = !isStepComplete(state.step); updateNavButtons(); }
 function validateFinal() { return state.fantasyName.length >= 3; }
 function updateSubmitButton() { const b = $('btn-submit'); b && (b.disabled = !validateFinal()); }
 
@@ -728,7 +727,6 @@ function handleFieldChange(target) {
   }
 
   renderStepDots();
-  validateStep();
   updateNavButtons();
 }
 
@@ -873,12 +871,22 @@ function goToStep(idx) {
 function nextStep() {
   if (state.step < STEPS.length - 1) { goToStep(state.step + 1); return; }
   if (!allStepsComplete()) {
-    const miss = missingSteps();
-    showToast(`❌ ${miss.join(' · ')}`);
+    showValidationModal();
     return;
   }
   showScreen('final');
   renderFinalScreen();
+}
+
+function showValidationModal() {
+  const miss = missingSteps();
+  const body = $('validation-body');
+  body.innerHTML = miss.map(m => `<li>⚠️ ${escapeHtml(m)}</li>`).join('');
+  $('validation-modal').classList.add('visible');
+}
+
+function hideValidationModal() {
+  $('validation-modal').classList.remove('visible');
 }
 
 function prevStep() {

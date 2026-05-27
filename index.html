@@ -134,6 +134,14 @@
     </div>
   </div>
 
+  <div id="validation-modal" class="validation-overlay" onclick="if (event.target === this) hideValidationModal()">
+    <div class="validation-modal-content">
+      <h3>⚠️ Faltan pasos</h3>
+      <ul id="validation-body" class="validation-modal-list"></ul>
+      <button class="btn btn--primary" onclick="hideValidationModal()">Entendido</button>
+    </div>
+  </div>
+
   <script src="js/data.js"></script>
   <script src="js/scoring.js"></script>
   <script src="js/simulated-results.js"></script>
