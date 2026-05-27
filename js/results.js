@@ -200,6 +200,8 @@ async function confirmRankingCode() {
     verifiedCodes.add(tag);
     try { sessionStorage.setItem('verified_codes', JSON.stringify([...verifiedCodes])); } catch (e) { /* ignore */ }
     hidePrivateModal();
+  }
+}
 
 function hidePrivateModal() {
   $('private-code-modal').classList.remove('visible');
