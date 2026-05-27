@@ -76,15 +76,19 @@ async function loadRanking() {
 
 let currentRankingView = 'general';
 
-function publicTags() {
+function allRankedTags() {
   const allNames = [...new Set(rankingData.flatMap(d => d.tags))];
-  const publicNames = new Set(allTournaments.filter(t => t.visibility === 'public').map(t => t.name));
-  return allNames.filter(n => publicNames.has(n)).sort();
+  const meta = {};
+  allTournaments.forEach(t => { meta[t.name] = t.visibility; });
+  return allNames
+    .filter(n => meta[n])
+    .map(n => ({ name: n, visibility: meta[n] }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 function renderGeneralRanking(data) {
   const container = $('results-body');
-  const allTags = publicTags();
+  const allTags = allRankedTags();
   const count = data.length;
 
   let html = `
@@ -122,7 +126,10 @@ function renderTable(data, allTags, view) {
     html += `<div class="tag-filter">
       <select id="tag-filter-select" onchange="switchTag(this.value)">
         <option value="">— Todos —</option>
-        ${allTags.map(t => `<option value="${escapeHtml(t)}" ${t === selectedTag ? 'selected' : ''}>${escapeHtml(t)}</option>`).join('')}
+        ${allTags.map(t => {
+          const label = t.visibility === 'private' ? '🔒 ' + t.name : t.name;
+          return `<option value="${escapeHtml(t.name)}" ${t.name === selectedTag ? 'selected' : ''}>${escapeHtml(label)}</option>`;
+        }).join('')}
       </select></div>`;
   }
 
@@ -185,14 +192,14 @@ function showPrivateRankingCodePrompt(tag) {
   const body = $('private-code-body');
   body.innerHTML = `
     <p style="margin-bottom:12px;">El torneo <strong>${escapeHtml(tag)}</strong> es privado. Ingresá el código de invitación para ver el ranking:</p>
-    <input type="text" id="private-code-input" maxlength="8" placeholder="Ej: ABC12" style="display:block;width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:12px;">
+    <input type="text" id="private-code-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="Ej: 1234" style="display:block;width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:12px;">
     <div id="rank-code-error" style="color:var(--danger);font-size:0.85rem;margin-bottom:8px;display:none;">Código incorrecto</div>
     <button class="btn btn--primary" style="width:100%;" onclick="confirmRankingCode()">Ingresar</button>`;
   $('private-code-modal').classList.add('visible');
 }
 
 async function confirmRankingCode() {
-  const code = $('private-code-input').value.trim().toUpperCase();
+  const code = $('private-code-input').value.trim();
   if (!code) return;
   const tag = new URLSearchParams(window.location.search).get('tag') || '';
   const ok = await supabase.verifyInviteCode(tag, code);
@@ -200,6 +207,9 @@ async function confirmRankingCode() {
     verifiedCodes.add(tag);
     try { sessionStorage.setItem('verified_codes', JSON.stringify([...verifiedCodes])); } catch (e) { /* ignore */ }
     hidePrivateModal();
+    switchTag(tag);
+  } else {
+    $('rank-code-error').style.display = 'block';
   }
 }
 

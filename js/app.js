@@ -10,6 +10,21 @@ function escapeHtml(str) {
 
 const STORAGE_KEY = 'mundial2026_state';
 
+const PLACEHOLDER_NAMES = [
+  'GastonSessa','LaureanoTombolini','HilarioNavarro','JuanCarlosOlave',
+  'CristianTula','EduardoTuzzio','AdrianGonzalez','CarlosMatheu',
+  'GastonAguirre','LucasLicht','ChristianCellay','JuanMercier',
+  'NestorOrtigoza','FabianCubero','LeandroSomoza','VictorZapata',
+  'JesusMendez','IsraelDamonte','NicolasOlmedo','RibairRodriguez',
+  'EmilianoPapa','FrancoNiell','MatiasGimenez','PatricioToranzo',
+  'SebastianPrediger','DavidRamirez','LucasBernardi','EstebanFuertes',
+  'JoseSand','SantiagoSilva','MarianoPavone','JeronimoBarrales',
+  'ClaudioBieler','RubenRamirez','CesarPereyra','FacundoParra',
+  'JoaquinBoghossian','AndresSilvera','IsmaelBlanco','LucianoFigueroa',
+  'SilvioRomero','JavierCampora','CarlosLuna','FedericoNieto',
+  'DenisStracqualursi'
+];
+
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -677,7 +692,7 @@ function renderFinalScreen() {
       </details>
     </div>
     <div class="final-section"><h3>🏷️ Nombre de fantasía</h3>
-      <input type="text" id="ff-name" placeholder="Ej: AldoParedes" maxlength="30" value="${escapeHtml(state.fantasyName)}">
+      <input type="text" id="ff-name" placeholder="Ej: ${PLACEHOLDER_NAMES[Math.floor(Math.random() * PLACEHOLDER_NAMES.length)]}" maxlength="30" value="${escapeHtml(state.fantasyName)}">
       <div id="ff-name-status" class="help-text">Debe ser único. Se valida al enviar.</div></div>
     <div class="final-section"><h3>🏆 Torneos (máx. 5)</h3>
       <p class="help-text">Los torneos te permiten agruparte con amigos. Escribí y elegí uno existente o creá uno nuevo.</p>
