@@ -465,7 +465,7 @@ function renderDobleCamiseta() {
           <span>El único debutante en esa fase</span>
         </button>
         <button class="choice-card choice-card--desc${dc.mode === 'compartido' ? ' active' : ''}" data-action="dc-mode" data-mode="compartido">
-          <strong>Compartido</strong>
+          <strong>Compartido (o único)</strong>
           <span>Puede llegar como único debutante pero también compartiendo con otros</span>
         </button>
       </div>
