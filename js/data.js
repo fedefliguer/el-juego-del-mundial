@@ -153,17 +153,17 @@ const STEPS = [
   {
     id: 'primera_vez',
     title: 'La primera vez',
-    desc: 'Elegí el debutante que llega más lejos.',
-    scoring: 'Sumás 400 puntos si acertás que llega más lejos junto a otro debutante (compartido). Sumás 1000 si es el único debutante que llega hasta esa ronda (único). Si todos se van en grupos: los que pusieron compartido suman 400, los que pusieron único suman 0.',
-    examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> Chile, compartido<br><span class="example-result">Si sale</span> Chile llega más lejos junto a otro debutante, <span class="example-pts">sumás 400</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Chile, único<br><span class="example-result">Si sale</span> Chile es el único debutante que llega a esa ronda, <span class="example-pts">sumás 1000</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Chile, único<br><span class="example-result">Si sale</span> todos los debutantes se van en grupos, <span class="example-pts">sumás 0</span></div>',
+    desc: 'Elegí el debutante que llega más lejos. Elegí si es el único que llega tan lejos o puede compartir con otro debutante.',
+    scoring: 'Si elegís único, sumás 1000 puntos si es el único de los 4 que llega tan lejos, sea cual sea la ronda. Si elegís compartido, sumás 400 puntos si no hay ninguno otro de los debutantes que llegue más lejos. Si todos se van en grupos: los que pusieron compartido suman 400, los que pusieron único suman 0.',
+    examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> Chile, compartido<br><span class="example-result">Si</span> Chile se va en octavos y todo el resto en grupos, <span class="example-pts">sumás 400</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Chile, único<br><span class="example-result">Si</span> Chile se va en octavos y todo el resto en grupos, <span class="example-pts">sumás 1000</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Chile, único<br><span class="example-result">Si sale</span> todos los debutantes se van en grupos, <span class="example-pts">sumás 0</span></div>',
     type: 'primera_vez'
   },
   {
     id: 'final',
     title: 'Final y campeón',
-    desc: "Elegí los dos finalistas, el resultado (sin contar penales) y el campeón.",
-    scoring: 'Sumás 500 puntos por cada finalista acertado. Sumás 300 si acertás el resultado exacto (incluye alargue). Sumás 2500 si acertás el campeón.',
-    examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> Italia vs Nigeria, 2 a 1, campeón Italia<br><span class="example-result">Si sale</span> Italia y Nigeria en la final, <span class="example-pts">sumás 500 cada uno (1000)</span></div><div class="example"><span class="example-result">Si sale</span> 2 a 1 el resultado, <span class="example-pts">sumás 300</span></div><div class="example"><span class="example-result">Si sale</span> Italia campeón, <span class="example-pts">sumás 2500</span></div>',
+    desc: "Elegí los dos finalistas, el resultado (contando eventual alargue) y el campeón.",
+    scoring: 'Sumás 500 puntos por cada finalista acertado. Sumás 300 si acertás el resultado exacto (incluye alargue). Sumás 2500 si acertás el campeón. Es indistinto poner 2 a 0 o 0 a 2.',
+    examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> Italia vs Nigeria, 2 a 1, campeón Italia<br><span class="example-result">Si sale</span> Italia y Nigeria en la final, <span class="example-pts">sumás 500 cada uno (1000)</span></div><div class="example"><span class="example-result">Si sale</span> 2 a 1 el resultado, <span class="example-pts">sumás 300</span></div><div class="example"><span class="example-result">Si sale</span> Italia campeón, <span class="example-pts">sumás 2500</span></div><div class="example"><span class="example-pts">Total si acertás todo: 3800</span></div>',
     type: 'final'
   },
   {
