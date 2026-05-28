@@ -415,6 +415,11 @@ function renderArgentina() {
     </select>
   </div>`;
 
+  if (a.grupo === '4') {
+    html += `<div class="arg-step done"><p class="muted-text" style="text-align:center;padding:8px 0;">Argentina sale en fase de grupos. No avanza al Eliminatorio.</p></div>`;
+    return html;
+  }
+
   order.forEach((s, i) => {
     const planted = a.plantarse === s;
     const afterPlant = a.plantarse && order.indexOf(a.plantarse) < i;
@@ -1078,22 +1083,31 @@ function teamStr(name) {
   return `${TEAM_FLAGS[name] || '🏳'} ${name}`;
 }
 
-function buildShareMsg(long) {
+function buildShareMsg(mode) {
+  if (mode === 'none') {
+    return `¡Completé mis predicciones del #Mundial2026! 🏆\n👉 ${GAME_URL}`;
+  }
   const f = state.answers.final;
   const champion = f.champion === '1' ? f.team1 : f.team2;
   let msg = `¡Completé mis predicciones del #Mundial2026! 🏆\n\nFinal: ${teamStr(f.team1)} vs ${teamStr(f.team2)}\nCampeón: ${teamStr(champion)}`;
-  if (long) {
+  if (mode === 'long' || mode === 'friends') {
     msg += '\n\nEx campeones:\n';
     CHAMPIONS.forEach(c => {
       const stage = state.answers.champions[c];
       const label = c === champion ? '🥇 Campeón' : (SHARE_STAGE_LABELS[stage] || stage || '?');
       msg += `${teamStr(c)} → ${label}\n`;
     });
-    const nc = state.answers.nonChamps.filter(n => n.team);
-    if (nc.length) {
-      msg += '\nSorpresas:\n';
-      nc.forEach(n => { msg += `${teamStr(n.team)} → ${SHARE_STAGE_LABELS[n.stage] || n.stage || '?'}\n`; });
-    }
+  }
+  if (mode === 'friends' && state.tags.length > 0) {
+    msg += '\nMis torneos:\n';
+    state.tags.forEach(t => {
+      const meta = state.tournamentMeta[t];
+      if (meta?.visibility === 'private' && meta?.inviteCode) {
+        msg += `🔒 ${t} — código: ${meta.inviteCode}\n`;
+      } else {
+        msg += `🏆 ${t}\n`;
+      }
+    });
   }
   msg += `\n\n👉 ${GAME_URL}`;
   return msg;
@@ -1102,19 +1116,22 @@ function buildShareMsg(long) {
 function updateDoneMsg() {
   const preview = $('done-msg-preview');
   if (!preview) return;
-  const isLong = document.querySelector('.done-toggle-btn.active')?.dataset.mode === 'long';
-  preview.value = buildShareMsg(isLong);
+  const mode = document.querySelector('.done-toggle-btn.active')?.dataset.mode || 'none';
+  preview.value = buildShareMsg(mode);
 }
 
 function renderDoneScreen() {
   const share = $('done-share');
   if (!share) return;
+  const hasTags = state.tags.length > 0;
   share.innerHTML = `
     <div class="done-share-section">
       <p class="help-text" style="text-align:center;margin:16px 0 10px;">Compartí tus predicciones</p>
       <div class="done-toggle">
-        <button class="done-toggle-btn active" data-mode="short">Final + campeón</button>
-        <button class="done-toggle-btn" data-mode="long">+ campeones históricos</button>
+        <button class="done-toggle-btn active" data-mode="none">Solo completé</button>
+        <button class="done-toggle-btn" data-mode="short">+ Final + campeón</button>
+        <button class="done-toggle-btn" data-mode="long">+ Campeones históricos</button>
+        ${hasTags ? `<button class="done-toggle-btn" data-mode="friends">+ Torneos</button>` : ''}
       </div>
       <textarea id="done-msg-preview" class="done-msg-preview" readonly></textarea>
       <div class="done-share-btns">
