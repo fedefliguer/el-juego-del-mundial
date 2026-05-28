@@ -285,9 +285,11 @@ function renderCurrentStep() {
   let header = `<h2 class="step-title">${step.title}</h2>
     <div class="step-meta">
       <p class="step-desc">${step.desc}</p>
-      <div class="step-scoring"><strong>Cómo suma:</strong> ${step.scoring}</div>
-      <button class="step-examples-toggle" data-action="toggle-examples">💡 Ejemplos</button>
-      <div class="step-examples-content" id="examples-${step.id}">${step.examples}</div>
+      <p class="step-scoring">${step.scoring}</p>
+      <button class="step-examples-toggle" data-action="toggle-examples">Ejemplos</button>
+      <div class="step-examples-content" id="examples-${step.id}">
+        ${step.examples}
+      </div>
     </div>`;
   let body = '';
 

@@ -120,9 +120,9 @@ const STEPS = [
   {
     id: 'groups',
     title: 'Fase de Grupos',
-    desc: 'Elegí 1° y 2° de los 12 grupos.',
-    scoring: 'Por grupo: 150 pts si acertás 1° y 2° en orden. 50 pts si pasan ambos pero al revés.',
-    examples: 'Italia 1°, Chile 2° → 150 pts. Italia 2°, Chile 1° → 50 pts. Nigeria pasa, Camerún no → 0 pts.',
+    desc: 'Elegí primero y segundo de los 12 grupos.',
+    scoring: 'En cada grupo, sumás 150 puntos si acertás al primero y segundo en orden. Sumás 50 si no los acertás en orden, pero ambos pasan de ronda. Sumás 0 si alguno no pasa de ronda.',
+    examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> Italia primero, Chile segundo<br><span class="example-result">Si sale</span> Italia primero y Chile segundo, <span class="example-pts">sumás 150</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Italia primero, Chile segundo<br><span class="example-result">Si sale</span> Chile primero e Italia segundo, <span class="example-pts">sumás 50</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Nigeria primero, Camerún segundo<br><span class="example-result">Si sale</span> Nigeria primero, pero Camerún no pasa de ronda, <span class="example-pts">sumás 0</span></div>',
     type: 'groups',
     groups: ['A','B','C','D','E','F','G','H','I','J','K','L']
   },
@@ -130,48 +130,48 @@ const STEPS = [
     id: 'champions',
     title: 'Los 7 países que saben cuánto pesa',
     desc: 'Elegí en qué ronda se vuelve cada uno de los 7 campeones mundiales.',
-    scoring: '300 pts por acierto. Si acertás que se vuelve en Fase de Grupos: 500 pts.',
-    examples: 'Italia en Octavos → 300 pts. Italia en Grupos → 500 pts. Italia llega más lejos de lo que pusiste → 0 pts.',
+    scoring: 'Sumás 300 puntos por cada campeón que aciertes. Si acertás que se vuelve en fase de grupos, sumás 500.',
+    examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> Italia en octavos de final<br><span class="example-result">Si sale</span> Italia se vuelve en octavos, <span class="example-pts">sumás 300</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Italia en octavos de final<br><span class="example-result">Si sale</span> Italia se vuelve en fase de grupos, <span class="example-pts">sumás 500</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Italia en octavos de final<br><span class="example-result">Si sale</span> Italia llega más lejos que octavos, <span class="example-pts">sumás 0</span></div>',
     type: 'champions'
   },
   {
     id: 'non_champions',
     title: 'Los 41 restantes',
-    desc: 'Elegí 3 países no campeones y acertá cuándo se vuelven.',
-    scoring: 'Grupos: 100 pts. Dieciseisavos: 150 pts. Octavos: 300 pts. Cuartos: 400 pts. 3° y 4°: 450 pts. Final: 500 pts.',
-    examples: 'Camerún en Octavos → 300 pts. Nigeria en Grupos → 100 pts. Chile llega más lejos de lo que pusiste → 0 pts.',
+    desc: 'Elegí 3 países no campeones y acertá en qué ronda se vuelven.',
+    scoring: 'Sumás 100 puntos si acertás que se vuelve en grupos, 150 en dieciseisavos, 300 en octavos, 400 en cuartos, 450 en tercer y cuarto puesto, 500 en la final.',
+    examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> Camerún en octavos de final<br><span class="example-result">Si sale</span> Camerún se vuelve en octavos, <span class="example-pts">sumás 300</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Nigeria en grupos<br><span class="example-result">Si sale</span> Nigeria se vuelve en grupos, <span class="example-pts">sumás 100</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Chile en cuartos de final<br><span class="example-result">Si sale</span> Chile se vuelve antes de cuartos, <span class="example-pts">sumás 0</span></div>',
     type: 'non_champions'
   },
   {
     id: 'argentina',
     title: 'El camino de Argentina',
     desc: 'Elegí en qué puesto del grupo queda Argentina y contra quién juega en cada ronda.',
-    scoring: '300 pts por cada acierto. Si te equivocás en una ronda, todo lo siguiente da 0. Podés plantarte para asegurar lo acumulado.',
-    examples: 'Argentina 1° del grupo → 300 pts. Gana contra Nigeria en Dieciseisavos → 300 pts. Si te equivocás ahí, octavos, cuartos y el resto dan 0.',
+    scoring: 'Sumás 300 puntos por cada acierto (puesto en el grupo más cada rival de ronda). Si te equivocás en una ronda, todo lo siguiente da 0. Podés plantarte para asegurar lo acumulado.',
+    examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> Argentina primera en el grupo<br><span class="example-result">Si sale</span> Argentina primera en el grupo, <span class="example-pts">sumás 300</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Argentina gana contra Nigeria en dieciseisavos<br><span class="example-result">Si sale</span> Argentina gana contra Nigeria en dieciseisavos, <span class="example-pts">sumás 300</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Argentina gana contra Camerún en octavos<br><span class="example-result">Si sale</span> Argentina pierde contra Camerún en octavos, octavos en adelante <span class="example-pts">dan 0</span></div>',
     type: 'argentina'
   },
   {
     id: 'primera_vez',
     title: 'La primera vez',
     desc: 'Elegí el debutante que llega más lejos.',
-    scoring: 'Compartido (empata con otro debutante): 400 pts. Único (llega solo hasta esa ronda): 1000 pts. Si todos se van en grupos: 400 pts a compartido, 0 a único.',
-    examples: 'Chile llega más lejos junto a otro debutante → 400 pts. Chile llega solo hasta esa ronda → 1000 pts.',
+    scoring: 'Sumás 400 puntos si acertás que llega más lejos junto a otro debutante (compartido). Sumás 1000 si es el único debutante que llega hasta esa ronda (único). Si todos se van en grupos: los que pusieron compartido suman 400, los que pusieron único suman 0.',
+    examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> Chile, compartido<br><span class="example-result">Si sale</span> Chile llega más lejos junto a otro debutante, <span class="example-pts">sumás 400</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Chile, único<br><span class="example-result">Si sale</span> Chile es el único debutante que llega a esa ronda, <span class="example-pts">sumás 1000</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Chile, único<br><span class="example-result">Si sale</span> todos los debutantes se van en grupos, <span class="example-pts">sumás 0</span></div>',
     type: 'primera_vez'
   },
   {
     id: 'final',
     title: 'Final y campeón',
-    desc: "Elegí los dos finalistas, el resultado (90' + alargue) y el campeón.",
-    scoring: 'Finalista acertado: 500 pts c/u. Resultado exacto: 300 pts. Campeón: 2500 pts.',
-    examples: 'Italia vs Nigeria, 2-1, campeón Italia → Italia finalista: 500 pts. Nigeria finalista: 500 pts. 2-1: 300 pts. Italia campeón: 2500 pts.',
+    desc: "Elegí los dos finalistas, el resultado (sin contar penales) y el campeón.",
+    scoring: 'Sumás 500 puntos por cada finalista acertado. Sumás 300 si acertás el resultado exacto (incluye alargue). Sumás 2500 si acertás el campeón.',
+    examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> Italia vs Nigeria, 2 a 1, campeón Italia<br><span class="example-result">Si sale</span> Italia y Nigeria en la final, <span class="example-pts">sumás 500 cada uno (1000)</span></div><div class="example"><span class="example-result">Si sale</span> 2 a 1 el resultado, <span class="example-pts">sumás 300</span></div><div class="example"><span class="example-result">Si sale</span> Italia campeón, <span class="example-pts">sumás 2500</span></div><div class="example"><span class="example-pts">Total si acertás todo: 3800</span></div>',
     type: 'final'
   },
   {
     id: 'goleador',
     title: 'Goleador',
     desc: 'Elegí al jugador que hace más goles y cuántos.',
-    scoring: 'Acertás el jugador (u "Otro"): 400 pts. Acertás los goles: 100 pts. Acertás ambos: 1000 pts en total. Si hay empate, suman todos.',
-    examples: 'Jugador de Nigeria, 5 goles → goleador acertado: 400 pts. 5 goles acertados: 100 pts más. Ambos: 1000 pts.',
+    scoring: 'Sumás 400 puntos si acertás el jugador (o "Otro"). Sumás 100 si acertás la cantidad de goles. Si acertás ambos, sumás 1000 en total. Si hay empate, suman todos.',
+    examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> jugador de Nigeria, 5 goles<br><span class="example-result">Si sale</span> ese jugador es el goleador, <span class="example-pts">sumás 400</span></div><div class="example"><span class="example-result">Si sale</span> hace exactamente 5 goles, <span class="example-pts">sumás 100 más</span></div><div class="example"><span class="example-result">Si sale</span> acertás ambas, <span class="example-pts">sumás 1000 en total</span></div>',
     type: 'goleador'
   }
 ];
