@@ -19,6 +19,28 @@ const PLACEHOLDER_NAMES = [
   'DenisStracqualursi'
 ];
 
+const GAME_URL = 'https://el-juego-del-mundial.vercel.app';
+
+const TEAM_FLAGS = {
+  'México':'🇲🇽','Sudáfrica':'🇿🇦','Corea del Sur':'🇰🇷','República Checa':'🇨🇿',
+  'Canadá':'🇨🇦','Bosnia y Herzegovina':'🇧🇦','Catar':'🇶🇦','Suiza':'🇨🇭',
+  'Brasil':'🇧🇷','Marruecos':'🇲🇦','Haití':'🇭🇹','Escocia':'🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+  'Estados Unidos':'🇺🇸','Paraguay':'🇵🇾','Australia':'🇦🇺','Turquía':'🇹🇷',
+  'Alemania':'🇩🇪','Curazao':'🇨🇼','Costa de Marfil':'🇨🇮','Ecuador':'🇪🇨',
+  'Países Bajos':'🇳🇱','Japón':'🇯🇵','Suecia':'🇸🇪','Túnez':'🇹🇳',
+  'Bélgica':'🇧🇪','Egipto':'🇪🇬','Irán':'🇮🇷','Nueva Zelanda':'🇳🇿',
+  'España':'🇪🇸','Cabo Verde':'🇨🇻','Arabia Saudita':'🇸🇦','Uruguay':'🇺🇾',
+  'Francia':'🇫🇷','Senegal':'🇸🇳','Irak':'🇮🇶','Noruega':'🇳🇴',
+  'Argentina':'🇦🇷','Argelia':'🇩🇿','Austria':'🇦🇹','Jordania':'🇯🇴',
+  'Portugal':'🇵🇹','RD Congo':'🇨🇩','Uzbekistán':'🇺🇿','Colombia':'🇨🇴',
+  'Inglaterra':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Croacia':'🇭🇷','Ghana':'🇬🇭','Panamá':'🇵🇦',
+};
+
+const SHARE_STAGE_LABELS = {
+  grupos:'Fase de grupos', dieciseisavos:'Dieciseisavos',
+  octavos:'Octavos', cuartos:'Cuartos', tercero:'3° y 4°', final:'Final',
+};
+
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -1038,6 +1060,7 @@ async function handleSubmit() {
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
     showScreen('done');
     $('done-name').textContent = `Registrado como "${state.fantasyName}".`;
+    renderDoneScreen();
   } catch (err) {
     if (err.message === 'duplicate_name') {
       showToast('❌ Ese nombre ya fue tomado. Elegí otro.');
@@ -1048,6 +1071,75 @@ async function handleSubmit() {
     }
     btn.disabled = false; btn.classList.remove('btn--loading');
   }
+}
+
+/* ---------- DONE SCREEN / SHARE ---------- */
+function teamStr(name) {
+  return `${TEAM_FLAGS[name] || '🏳'} ${name}`;
+}
+
+function buildShareMsg(long) {
+  const f = state.answers.final;
+  const champion = f.champion === '1' ? f.team1 : f.team2;
+  let msg = `¡Completé mis predicciones del #Mundial2026! 🏆\n\nFinal: ${teamStr(f.team1)} vs ${teamStr(f.team2)}\nCampeón: ${teamStr(champion)}`;
+  if (long) {
+    msg += '\n\nEx campeones:\n';
+    CHAMPIONS.forEach(c => {
+      const stage = state.answers.champions[c];
+      const label = c === champion ? '🥇 Campeón' : (SHARE_STAGE_LABELS[stage] || stage || '?');
+      msg += `${teamStr(c)} → ${label}\n`;
+    });
+    const nc = state.answers.nonChamps.filter(n => n.team);
+    if (nc.length) {
+      msg += '\nSorpresas:\n';
+      nc.forEach(n => { msg += `${teamStr(n.team)} → ${SHARE_STAGE_LABELS[n.stage] || n.stage || '?'}\n`; });
+    }
+  }
+  msg += `\n\n👉 ${GAME_URL}`;
+  return msg;
+}
+
+function updateDoneMsg() {
+  const preview = $('done-msg-preview');
+  if (!preview) return;
+  const isLong = document.querySelector('.done-toggle-btn.active')?.dataset.mode === 'long';
+  preview.value = buildShareMsg(isLong);
+}
+
+function renderDoneScreen() {
+  const share = $('done-share');
+  if (!share) return;
+  share.innerHTML = `
+    <div class="done-share-section">
+      <p class="help-text" style="text-align:center;margin:16px 0 10px;">Compartí tus predicciones</p>
+      <div class="done-toggle">
+        <button class="done-toggle-btn active" data-mode="short">Final + campeón</button>
+        <button class="done-toggle-btn" data-mode="long">+ campeones históricos</button>
+      </div>
+      <textarea id="done-msg-preview" class="done-msg-preview" readonly></textarea>
+      <div class="done-share-btns">
+        <button class="btn btn--ghost" id="btn-share-wa">📱 WhatsApp</button>
+        <button class="btn btn--ghost" id="btn-share-tw">𝕏 Twitter</button>
+        <button class="btn btn--ghost" id="btn-copy-msg">📋 Copiar</button>
+      </div>
+    </div>`;
+  updateDoneMsg();
+  share.querySelectorAll('.done-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      share.querySelectorAll('.done-toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateDoneMsg();
+    });
+  });
+  $('btn-share-wa').addEventListener('click', () => {
+    window.open(`https://wa.me/?text=${encodeURIComponent($('done-msg-preview').value)}`, '_blank');
+  });
+  $('btn-share-tw').addEventListener('click', () => {
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent($('done-msg-preview').value)}`, '_blank');
+  });
+  $('btn-copy-msg').addEventListener('click', () => {
+    navigator.clipboard.writeText($('done-msg-preview').value).then(() => showToast('✅ Copiado al portapapeles'));
+  });
 }
 
 /* ---------- EVENT DELEGATION ---------- */

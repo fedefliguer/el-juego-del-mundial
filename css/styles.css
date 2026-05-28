@@ -742,6 +742,25 @@ select { cursor: pointer; appearance: auto; }
 .share-box { display: flex; gap: 8px; margin-top: 8px; }
 .share-box input { flex: 1; font-size: 0.85rem; }
 
+/* --- Share section (done screen) --- */
+.done-share-section { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px; }
+.done-toggle { display: flex; gap: 6px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap; }
+.done-toggle-btn {
+  padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border);
+  background: transparent; color: var(--text-muted); font-size: 0.82rem;
+  font-family: var(--font); cursor: pointer; transition: all 0.15s;
+}
+.done-toggle-btn:hover { border-color: var(--primary); color: var(--text); }
+.done-toggle-btn.active { background: var(--primary); border-color: var(--primary); color: #0f172a; font-weight: 600; }
+.done-msg-preview {
+  width: 100%; min-height: 110px; padding: 10px 12px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); font-size: 0.82rem; line-height: 1.55;
+  font-family: var(--font); color: var(--text-muted); background: #f8fafc;
+  resize: none; box-sizing: border-box; margin-bottom: 10px;
+}
+.done-share-btns { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.done-share-btns .btn { font-size: 0.85rem; padding: 9px 14px; }
+
 /* --- Toast --- */
 .toast {
   position: fixed;
