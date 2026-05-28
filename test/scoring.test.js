@@ -262,6 +262,94 @@ describe('Camino de Argentina', () => {
     );
     expect(s.breakdown.argentina).toBe(0);
   });
+
+  // --- Plantarse tests ---
+
+  test('plantarse en cuartos con grupo+rivales previos correctos (real llega a final) = 3 × 300', () => {
+    const a = {
+      argentina: {
+        grupo: '1',
+        rivales: { dieciseisavos: 'Senegal', octavos: 'Uruguay' },
+        plantarse: 'cuartos',
+      }
+    };
+    const s = computeScore(a, R);
+    expect(s.breakdown.argentina).toBe(3 * PUNTOS.argentina_por_acierto);
+  });
+
+  test('plantarse en octavos con grupo+dieciseisavos correctos (real llega a final) = 2 × 300', () => {
+    const a = {
+      argentina: {
+        grupo: '1',
+        rivales: { dieciseisavos: 'Senegal' },
+        plantarse: 'octavos',
+      }
+    };
+    const s = computeScore(a, R);
+    expect(s.breakdown.argentina).toBe(2 * PUNTOS.argentina_por_acierto);
+  });
+
+  test('plantarse en dieciseisavos con grupo correcto (real llega a final) = 1 × 300', () => {
+    const a = {
+      argentina: {
+        grupo: '1',
+        rivales: {},
+        plantarse: 'dieciseisavos',
+      }
+    };
+    const s = computeScore(a, R);
+    expect(s.breakdown.argentina).toBe(PUNTOS.argentina_por_acierto);
+  });
+
+  test('plantarse correcto: real pierde en octavos, usuario planta en cuartos con rivales previos correctos = 3 × 300', () => {
+    const r = {
+      argentina: {
+        grupo: '1',
+        rivales: { dieciseisavos: 'Senegal', octavos: 'Uruguay' },
+        plantarse: null,
+      }
+    };
+    const a = {
+      argentina: {
+        grupo: '1',
+        rivales: { dieciseisavos: 'Senegal', octavos: 'Uruguay' },
+        plantarse: 'cuartos',
+      }
+    };
+    const s = computeScore(a, r);
+    expect(s.breakdown.argentina).toBe(3 * PUNTOS.argentina_por_acierto);
+  });
+
+  test('plantarse incorrecto: real tiene octavos pero usuario planta en octavos = 2 × 300 (grupo+dieciseisavos)', () => {
+    const r = {
+      argentina: {
+        grupo: '1',
+        rivales: { dieciseisavos: 'Senegal', octavos: 'Uruguay', cuartos: 'Países Bajos' },
+        plantarse: null,
+      }
+    };
+    const a = {
+      argentina: {
+        grupo: '1',
+        rivales: { dieciseisavos: 'Senegal' },
+        plantarse: 'octavos',
+      }
+    };
+    const s = computeScore(a, r);
+    expect(s.breakdown.argentina).toBe(2 * PUNTOS.argentina_por_acierto);
+  });
+
+  test('plantarse con grupo erróneo = 0', () => {
+    const a = {
+      argentina: {
+        grupo: '2',
+        rivales: { dieciseisavos: 'Senegal' },
+        plantarse: 'dieciseisavos',
+      }
+    };
+    const s = computeScore(a, R);
+    expect(s.breakdown.argentina).toBe(0);
+  });
 });
 
 describe('Doble camiseta', () => {

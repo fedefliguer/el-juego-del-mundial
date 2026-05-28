@@ -57,7 +57,7 @@ const SIMULATED_RESULTS = {
     champion: '1'
   },
   goleador: {
-    player: 'Lionel Messi',
+    player: 'Lionel Messi (Argentina)',
     goals: '8'
   }
 };

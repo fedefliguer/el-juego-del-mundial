@@ -152,7 +152,7 @@ function isStepPartial(idx) {
     const f = state.answers.final;
     return !!(f.team1 || f.team2 || f.score1 !== '0' || f.score2 !== '0' || f.champion);
   }
-  if (type === 'goleador') return !!(state.answers.goleador.player || state.answers.goleador.goals !== '');
+  if (type === 'goleador') return !!state.answers.goleador.player;
   return false;
 }
 
@@ -275,7 +275,7 @@ function renderCurrentStep() {
     <div class="step-scroll">
       ${header}${body}
       <div class="step-actions">
-        <button class="btn btn--ghost btn--action" id="btn-clear">🗑️ Borrar paso</button>
+        <button class="btn btn--ghost btn--action" id="btn-clear">🗑️ Limpiar este paso</button>
         <button class="btn btn--ghost btn--action" id="btn-random">🎲 Aleatorio</button>
       </div>
       <div class="step-actions" style="margin-top:6px;">
@@ -291,7 +291,9 @@ function renderCurrentStep() {
   $('btn-clear').addEventListener('click', clearStep);
   $('btn-random').addEventListener('click', fillStepRandom);
   const resetBtn = $('btn-reset');
-  if (resetBtn) resetBtn.addEventListener('click', resetAll);
+  if (resetBtn) resetBtn.addEventListener('click', () => {
+    if (confirm('¿Estás seguro? Se borrarán TODAS tus predicciones y se empezará de nuevo.')) resetAll();
+  });
 
   btnBack.style.visibility = state.step === 0 ? 'hidden' : 'visible';
   updateNavButtons();
