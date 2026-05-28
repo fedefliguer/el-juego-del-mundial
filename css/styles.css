@@ -760,6 +760,15 @@ select { cursor: pointer; appearance: auto; }
 }
 .done-share-btns { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
 .done-share-btns .btn { font-size: 0.85rem; padding: 9px 14px; }
+.done-tournament-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+.done-tournament-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.done-tag-btn {
+  padding: 6px 13px; border-radius: 20px; border: 1.5px solid var(--border);
+  background: transparent; color: var(--text-muted); font-size: 0.82rem;
+  font-family: var(--font); cursor: pointer; transition: all 0.15s;
+}
+.done-tag-btn:hover { border-color: var(--primary); color: var(--text); }
+.done-tag-btn.active { background: var(--primary); border-color: var(--primary); color: #0f172a; font-weight: 600; }
 
 /* --- Toast --- */
 .toast {

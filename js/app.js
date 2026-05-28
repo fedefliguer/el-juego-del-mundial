@@ -415,18 +415,16 @@ function renderArgentina() {
     </select>
   </div>`;
 
-  if (a.grupo === '4') {
-    html += `<div class="arg-step done"><p class="muted-text" style="text-align:center;padding:8px 0;">Argentina sale en fase de grupos. No avanza al Eliminatorio.</p></div>`;
-    return html;
-  }
+  const locked = a.grupo === '4';
+  const effectivePlantarse = locked ? 'dieciseisavos' : a.plantarse;
 
   order.forEach((s, i) => {
-    const planted = a.plantarse === s;
-    const afterPlant = a.plantarse && order.indexOf(a.plantarse) < i;
+    const planted = effectivePlantarse === s;
+    const afterPlant = effectivePlantarse && order.indexOf(effectivePlantarse) < i;
     if (afterPlant) {
       html += `<div class="arg-step muted"><h4>${labels[s]}</h4><span class="muted-text">—</span></div>`;
     } else if (planted) {
-      html += `<div class="arg-step done"><h4>${labels[s]}</h4><span class="planted-badge">✅ Te plantaste acá</span><button class="btn-change" data-action="unplantar" data-stage="${s}">✎</button></div>`;
+      html += `<div class="arg-step done"><h4>${labels[s]}</h4><span class="planted-badge">✅ Te plantaste acá</span>${locked ? '' : `<button class="btn-change" data-action="unplantar" data-stage="${s}">✎</button>`}</div>`;
     } else {
       const filled = a.rivales[s];
       const allPrevFilled = i === 0 || order.slice(0, i).every(p => a.rivales[p]);
@@ -866,7 +864,7 @@ function handleFieldChange(target) {
     const v = target.value;
     if (v === '3' || v === '4') {
       ['dieciseisavos','octavos','cuartos','semis','final'].forEach(s => state.answers.argentina.rivales[s] = '');
-      state.answers.argentina.plantarse = null;
+      state.answers.argentina.plantarse = v === '4' ? 'dieciseisavos' : null;
     }
     renderCurrentStep(); return;
   }
@@ -1083,24 +1081,26 @@ function teamStr(name) {
   return `${TEAM_FLAGS[name] || '🏳'} ${name}`;
 }
 
-function buildShareMsg(mode) {
+function buildShareMsg(mode, selectedTags) {
+  let msg;
   if (mode === 'none') {
-    return `¡Completé mis predicciones del #Mundial2026! 🏆\n👉 ${GAME_URL}`;
+    msg = `¡Completé mis predicciones del #Mundial2026! 🏆`;
+  } else {
+    const f = state.answers.final;
+    const champion = f.champion === '1' ? f.team1 : f.team2;
+    msg = `¡Completé mis predicciones del #Mundial2026! 🏆\n\nFinal: ${teamStr(f.team1)} vs ${teamStr(f.team2)}\nCampeón: ${teamStr(champion)}`;
+    if (mode === 'long') {
+      msg += '\n\nEx campeones:\n';
+      CHAMPIONS.forEach(c => {
+        const stage = state.answers.champions[c];
+        const label = c === champion ? '🥇 Campeón' : (SHARE_STAGE_LABELS[stage] || stage || '?');
+        msg += `${teamStr(c)} → ${label}\n`;
+      });
+    }
   }
-  const f = state.answers.final;
-  const champion = f.champion === '1' ? f.team1 : f.team2;
-  let msg = `¡Completé mis predicciones del #Mundial2026! 🏆\n\nFinal: ${teamStr(f.team1)} vs ${teamStr(f.team2)}\nCampeón: ${teamStr(champion)}`;
-  if (mode === 'long' || mode === 'friends') {
-    msg += '\n\nEx campeones:\n';
-    CHAMPIONS.forEach(c => {
-      const stage = state.answers.champions[c];
-      const label = c === champion ? '🥇 Campeón' : (SHARE_STAGE_LABELS[stage] || stage || '?');
-      msg += `${teamStr(c)} → ${label}\n`;
-    });
-  }
-  if (mode === 'friends' && state.tags.length > 0) {
-    msg += '\nMis torneos:\n';
-    state.tags.forEach(t => {
+  if (selectedTags && selectedTags.length > 0) {
+    msg += '\n\nMis torneos:\n';
+    selectedTags.forEach(t => {
       const meta = state.tournamentMeta[t];
       if (meta?.visibility === 'private' && meta?.inviteCode) {
         msg += `🔒 ${t} — código: ${meta.inviteCode}\n`;
@@ -1117,7 +1117,8 @@ function updateDoneMsg() {
   const preview = $('done-msg-preview');
   if (!preview) return;
   const mode = document.querySelector('.done-toggle-btn.active')?.dataset.mode || 'none';
-  preview.value = buildShareMsg(mode);
+  const selectedTags = [...document.querySelectorAll('.done-tag-btn.active')].map(b => b.dataset.tag);
+  preview.value = buildShareMsg(mode, selectedTags);
 }
 
 function renderDoneScreen() {
@@ -1131,8 +1132,17 @@ function renderDoneScreen() {
         <button class="done-toggle-btn active" data-mode="none">Solo completé</button>
         <button class="done-toggle-btn" data-mode="short">+ Final + campeón</button>
         <button class="done-toggle-btn" data-mode="long">+ Campeones históricos</button>
-        ${hasTags ? `<button class="done-toggle-btn" data-mode="friends">+ Torneos</button>` : ''}
       </div>
+      ${hasTags ? `
+      <div class="done-tournament-section">
+        <p class="help-text" style="margin:14px 0 8px;">Invitá a tus torneos</p>
+        <div class="done-tournament-tags">
+          ${state.tags.map(t => {
+            const isPrivate = state.tournamentMeta[t]?.visibility === 'private';
+            return `<button class="done-tag-btn" data-tag="${escapeHtml(t)}">${escapeHtml(t)}${isPrivate ? ' 🔒' : ''}</button>`;
+          }).join('')}
+        </div>
+      </div>` : ''}
       <textarea id="done-msg-preview" class="done-msg-preview" readonly></textarea>
       <div class="done-share-btns">
         <button class="btn btn--ghost" id="btn-share-wa">📱 WhatsApp</button>
@@ -1147,6 +1157,9 @@ function renderDoneScreen() {
       btn.classList.add('active');
       updateDoneMsg();
     });
+  });
+  share.querySelectorAll('.done-tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => { btn.classList.toggle('active'); updateDoneMsg(); });
   });
   $('btn-share-wa').addEventListener('click', () => {
     window.open(`https://wa.me/?text=${encodeURIComponent($('done-msg-preview').value)}`, '_blank');
