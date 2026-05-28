@@ -277,12 +277,18 @@ function renderCurrentStep() {
   const total = STEPS.length;
   const comp = STEPS.filter((_, i) => isStepComplete(i)).length;
 
-  stepCounter.textContent = `Paso ${state.step + 1} de 7 — ${STEP_NAMES[state.step]}`;
+  stepCounter.textContent = `Desafío ${state.step + 1} de ${STEPS.length} — ${STEP_NAMES[state.step]}`;
   progressFill.style.width = `${(comp / total) * 100}%`;
   renderStepDots();
 
   const type = step.type || 'groups';
-  let header = `<h2 class="step-title">${step.title}</h2><p class="step-desc">${step.desc}</p>`;
+  let header = `<h2 class="step-title">${step.title}</h2>
+    <div class="step-meta">
+      <p class="step-desc">${step.desc}</p>
+      <div class="step-scoring"><strong>Cómo suma:</strong> ${step.scoring}</div>
+      <button class="step-examples-toggle" data-action="toggle-examples">💡 Ejemplos</button>
+      <div class="step-examples-content" id="examples-${step.id}">${step.examples}</div>
+    </div>`;
   let body = '';
 
   if (type === 'groups') body = renderGroups();
@@ -984,35 +990,35 @@ function missingSteps() {
         const s = state.answers.groups[g];
         return !s || !s.first || !s.second || s.first === s.second;
       });
-      details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta ${miss.join(', ')}`);
+      details.push(`<strong>Desafío ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta ${miss.join(', ')}`);
     } else if (t === 'champions') {
       const miss = CHAMPIONS.filter(c => !state.answers.champions[c]);
-      details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta ${miss.join(', ')}`);
+      details.push(`<strong>Desafío ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta ${miss.join(', ')}`);
     } else if (t === 'non_champions') {
       const n = state.answers.nonChamps.filter(n => !n.team || !n.stage).length;
-      details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: faltan ${n} equipo(s)`);
+      details.push(`<strong>Desafío ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: faltan ${n} equipo(s)`);
     } else if (t === 'argentina') {
       const a = state.answers.argentina;
-      if (!a.grupo) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta posición en el grupo`);
+      if (!a.grupo) details.push(`<strong>Desafío ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta posición en el grupo`);
       else if (parseInt(a.grupo) < 3 && !a.plantarse) {
         const miss = ['dieciseisavos','octavos','cuartos','semis','final'].filter(s => !a.rivales?.[s]);
-        if (miss.length) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta rival en ${miss.join(', ')}`);
+        if (miss.length) details.push(`<strong>Desafío ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta rival en ${miss.join(', ')}`);
       }
     } else if (t === 'primera_vez') {
-      if (!state.answers.dobleCamiseta.team) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta elegir debutante`);
-      else if (!state.answers.dobleCamiseta.mode) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta elegir único o compartido`);
+      if (!state.answers.dobleCamiseta.team) details.push(`<strong>Desafío ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta elegir debutante`);
+      else if (!state.answers.dobleCamiseta.mode) details.push(`<strong>Desafío ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta elegir único o compartido`);
     } else if (t === 'final') {
       const f = state.answers.final;
-      if (!f.team1) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta Finalista A`);
-      else if (!f.team2) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta Finalista B`);
-      else if (f.team1 === f.team2) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: los finalistas deben ser distintos`);
-      else if (f.score1 === '' || f.score2 === '') details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta resultado`);
-      else if (!f.champion) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta elegir campeón`);
+      if (!f.team1) details.push(`<strong>Desafío ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta Finalista A`);
+      else if (!f.team2) details.push(`<strong>Desafío ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta Finalista B`);
+      else if (f.team1 === f.team2) details.push(`<strong>Desafío ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: los finalistas deben ser distintos`);
+      else if (f.score1 === '' || f.score2 === '') details.push(`<strong>Desafío ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta resultado`);
+      else if (!f.champion) details.push(`<strong>Desafío ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta elegir campeón`);
     } else if (t === 'goleador') {
-      if (!state.answers.goleador.player) details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta elegir jugador`);
-      else if (state.answers.goleador.goals === '') details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta cantidad de goles`);
+      if (!state.answers.goleador.player) details.push(`<strong>Desafío ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta elegir jugador`);
+      else if (state.answers.goleador.goals === '') details.push(`<strong>Desafío ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>: falta cantidad de goles`);
     } else {
-      details.push(`<strong>Paso ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>`);
+      details.push(`<strong>Desafío ${i+1} de ${STEPS.length} — ${escapeHtml(step.title)}</strong>`);
     }
   });
   return details;
@@ -1181,6 +1187,10 @@ document.addEventListener('click', e => {
   const actionEl = t.dataset.action ? t : t.closest('[data-action]');
   if (actionEl) {
     if (actionEl.dataset.action === 'group-pick') handleGroupPick(actionEl);
+    else if (actionEl.dataset.action === 'toggle-examples') {
+      const content = actionEl.parentElement.querySelector('.step-examples-content');
+      if (content) content.classList.toggle('visible');
+    }
     else handleAction(actionEl);
   }
   if (t.classList.contains('nav-brand') && typeof showAdminScreen === 'function') {
