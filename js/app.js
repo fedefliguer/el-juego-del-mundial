@@ -1091,11 +1091,48 @@ function teamStr(name) {
 
 function buildShareMsg(mode, selectedTags) {
   let msg;
+  const f = state.answers.final;
+  const champion = f.champion === '1' ? f.team1 : f.team2;
   if (mode === 'none') {
     msg = `¡Completé mis predicciones del #Mundial2026! 🏆`;
+  } else if (mode === 'full') {
+    msg = `📋 MIS PREDICCIONES — Mundial 2026\n\n`;
+    msg += `— GRUPOS —\n`;
+    Object.keys(GROUPS).forEach(g => {
+      const pick = state.answers.groups[g];
+      if (pick?.first && pick?.second) {
+        msg += `  Grupo ${g}: 1° ${pick.first}, 2° ${pick.second}\n`;
+      }
+    });
+    msg += `\n— CAMPEONES MUNDIALES —\n`;
+    CHAMPIONS.forEach(c => {
+      const stage = state.answers.champions[c];
+      if (stage) msg += `  ${c}: ${SHARE_STAGE_LABELS[stage] || stage}\n`;
+    });
+    const nc = state.answers.nonChamps.filter(n => n.team && n.stage);
+    if (nc.length) {
+      msg += `\n— 3 REVELACIONES —\n`;
+      nc.forEach(n => msg += `  ${n.team}: ${SHARE_STAGE_LABELS[n.stage] || n.stage}\n`);
+    }
+    const a = state.answers.argentina;
+    msg += `\n— CAMINO DE ARGENTINA —\n`;
+    if (a.grupo) {
+      const posLabel = {1:'1°',2:'2°',3:'3°',4:'4°'}[a.grupo] || `${a.grupo}°`;
+      msg += `  Puesto en grupo: ${posLabel}\n`;
+      if (a.plantarse) msg += `  ✅ Plantado en: ${SHARE_STAGE_LABELS[a.plantarse] || a.plantarse}\n`;
+      else {
+        const rivalStages = ['dieciseisavos','octavos','cuartos','semis','final'];
+        rivalStages.forEach(s => {
+          if (a.rivales?.[s]) msg += `  ${SHARE_STAGE_LABELS[s]}: gana contra ${a.rivales[s]}\n`;
+        });
+      }
+    }
+    const dc = state.answers.dobleCamiseta;
+    if (dc.team) msg += `\n— DEBUTANTE —\n  ${dc.team} (${dc.mode === 'solo' ? 'único' : 'compartido'})\n`;
+    msg += `\n— FINAL —\n  ${f.team1 || '?'} vs ${f.team2 || '?'}\n  ${f.score1 !== '' ? f.score1 : '?'}-${f.score2 !== '' ? f.score2 : '?'}\n  Campeón: ${champion || '?'}\n`;
+    const g = state.answers.goleador;
+    if (g.player) msg += `\n— GOLEADOR —\n  ${g.player} — ${g.goals || '?'} goles\n`;
   } else {
-    const f = state.answers.final;
-    const champion = f.champion === '1' ? f.team1 : f.team2;
     msg = `¡Completé mis predicciones del #Mundial2026! 🏆\n\nFinal: ${teamStr(f.team1)} vs ${teamStr(f.team2)}\nCampeón: ${teamStr(champion)}`;
     if (mode === 'long') {
       msg += '\n\nEx campeones:\n';
@@ -1140,6 +1177,7 @@ function renderDoneScreen() {
         <button class="done-toggle-btn active" data-mode="none">Solo completé</button>
         <button class="done-toggle-btn" data-mode="short">+ Final + campeón</button>
         <button class="done-toggle-btn" data-mode="long">+ Campeones históricos</button>
+        <button class="done-toggle-btn" data-mode="full">Predicciones completas</button>
       </div>
       ${hasTags ? `
       <div class="done-tournament-section">
@@ -1178,6 +1216,7 @@ function renderDoneScreen() {
   $('btn-copy-msg').addEventListener('click', () => {
     navigator.clipboard.writeText($('done-msg-preview').value).then(() => showToast('✅ Copiado al portapapeles'));
   });
+
 }
 
 /* ---------- EVENT DELEGATION ---------- */
