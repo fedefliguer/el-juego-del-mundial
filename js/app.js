@@ -1115,17 +1115,15 @@ function buildShareMsg(mode, selectedTags) {
       nc.forEach(n => msg += `  ${n.team}: ${SHARE_STAGE_LABELS[n.stage] || n.stage}\n`);
     }
     const a = state.answers.argentina;
-    msg += `\n— CAMINO DE ARGENTINA —\n`;
     if (a.grupo) {
+      msg += `\n— CAMINO DE ARGENTINA —\n  `;
       const posLabel = {1:'1°',2:'2°',3:'3°',4:'4°'}[a.grupo] || `${a.grupo}°`;
-      msg += `  Puesto en grupo: ${posLabel}\n`;
-      if (a.plantarse) msg += `  ✅ Plantado en: ${SHARE_STAGE_LABELS[a.plantarse] || a.plantarse}\n`;
-      else {
-        const rivalStages = ['dieciseisavos','octavos','cuartos','semis','final'];
-        rivalStages.forEach(s => {
-          if (a.rivales?.[s]) msg += `  ${SHARE_STAGE_LABELS[s]}: gana contra ${a.rivales[s]}\n`;
-        });
-      }
+      const parts = [posLabel];
+      ['dieciseisavos','octavos','cuartos','semis','final'].forEach(s => {
+        if (a.rivales?.[s]) parts.push(a.rivales[s]);
+      });
+      if (a.plantarse) parts.push('✅ plantado');
+      msg += parts.join(', ') + '\n';
     }
     const dc = state.answers.dobleCamiseta;
     if (dc.team) msg += `\n— DEBUTANTE —\n  ${dc.team} (${dc.mode === 'solo' ? 'único' : 'compartido'})\n`;
