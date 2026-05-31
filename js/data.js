@@ -317,8 +317,8 @@ const STEPS = [
   {
     id: 'primera_vez',
     title: 'La primera vez',
-    desc: 'Elegí el debutante que llega más lejos. Elegí si es el único que llega tan lejos o puede compartir con otro debutante.',
-    scoring: 'Si elegís único, sumás 1000 puntos si es el único de los 4 que llega tan lejos, sea cual sea la ronda. Si elegís Compartido (o único), sumás 400 puntos si no hay ninguno otro de los debutantes que llegue más lejos.',
+    desc: 'Elegí el debutante que llega más lejos. Elegí si es el único que llega hasta ahí o puede compartir con otro debutante.',
+    scoring: 'Si elegís único, sumás 1000 puntos si es el único de los 4 que llega hasta ahí, sea cual sea la ronda. Si elegís Compartido (o único), sumás 400 puntos si no hay ninguno otro de los debutantes que llegue más lejos.',
     examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> Chile, compartido<br><span class="example-result">Si</span> Chile se va en octavos y todo el resto en grupos, <span class="example-pts">sumás 400</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Chile, único<br><span class="example-result">Si</span> Chile se va en octavos y todo el resto en grupos, <span class="example-pts">sumás 1000</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Chile, único<br><span class="example-result">Si sale</span> todos los debutantes se van en grupos, <span class="example-pts">sumás 0</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Chile, compartido<br><span class="example-result">Si sale</span> todos los debutantes se van en grupos, <span class="example-pts">sumás 400</span></div>',
     type: 'primera_vez'
   },
