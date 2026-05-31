@@ -61,42 +61,293 @@ const STAGES = [
 
 // ---------- JUGADORES (Goleador) ----------
 const PLAYERS = [
-  'Álvaro Morata (España)',
-  'Antoine Griezmann (Francia)',
-  'Bukayo Saka (Inglaterra)',
-  'Cody Gakpo (Países Bajos)',
-  'Cristiano Ronaldo (Portugal)',
-  'Darwin Núñez (Uruguay)',
-  'Erling Haaland (Noruega)',
-  'Giorgian de Arrascaeta (Uruguay)',
-  'Gonçalo Ramos (Portugal)',
-  'Harry Kane (Inglaterra)',
-  'Jamal Musiala (Alemania)',
-  'Jonathan David (Canadá)',
-  'Jude Bellingham (Inglaterra)',
-  'Julián Álvarez (Argentina)',
-  'Kaoru Mitoma (Japón)',
-  'Kevin De Bruyne (Bélgica)',
-  'Kylian Mbappé (Francia)',
-  'Lamine Yamal (España)',
-  'Lautaro Martínez (Argentina)',
+  // ARGENTINA
   'Lionel Messi (Argentina)',
-  'Luis Díaz (Colombia)',
-  'Mehdi Taremi (Irán)',
-  'Memphis Depay (Países Bajos)',
-  'Mikel Oyarzabal (España)',
-  'Mohamed Salah (Egipto)',
-  'Niclas Füllkrug (Alemania)',
-  'Phil Foden (Inglaterra)',
-  'Rafael Leão (Portugal)',
-  'Rodrygo (Brasil)',
-  'Romelu Lukaku (Bélgica)',
-  'Sadio Mané (Senegal)',
-  'Santiago Giménez (México)',
-  'Son Heung-min (Corea del Sur)',
-  'Takumi Minamino (Japón)',
-  'Victor Osimhen (Nigeria)',
+  'Lautaro Martínez (Argentina)',
+  'Julián Álvarez (Argentina)',
+  'Nico González (Argentina)',
+  'Nicolás Tagliafico (Argentina)',
+  'Giovani Lo Celso (Argentina)',
+  'Gonzalo Montiel (Argentina)',
+  'Alejandro Garnacho (Argentina)', // REVISAR - probablemente no
+  'Paulo Dybala (Argentina)',
+
+  // BRASIL
   'Vinicius Jr (Brasil)',
+  'Rodrygo (Brasil)',
+  'Endrick (Brasil)',
+  'Neymar (Brasil)',
+  'Lucas Paquetá (Brasil)',
+  'Richarlison (Brasil)',
+  'Gabriel Martinelli (Brasil)',
+  'Antony (Brasil)',
+  'Vinícius Júnior (Brasil)',
+  'Joelinton (Brasil)',
+  'Douglas Luiz (Brasil)',
+
+  // FRANCIA
+  'Kylian Mbappé (Francia)',
+  'Antoine Griezmann (Francia)',
+  'Ousmane Dembélé (Francia)',
+  'Aurélien Tchouaméni (Francia)',
+  'Eduardo Camavinga (Francia)',
+  'Dayot Upamecano (Francia)',
+  'Jules Koundé (Francia)',
+  'N\'Golo Kanté (Francia)',
+  'Theo Hernández (Francia)',
+
+  // ALEMANIA
+  'Jamal Musiala (Alemania)',
+  'Florian Wirtz (Alemania)',
+  'Leroy Sané (Alemania)',
+  'Kai Havertz (Alemania)',
+  'Serge Gnabry (Alemania)',
+  'Thomas Müller (Alemania)',
+  'Manuel Neuer (Alemania)',
+  'Antonio Rüdiger (Alemania)',
+  'Joshua Kimmich (Alemania)',
+
+  // ESPAÑA
+  'Álvaro Morata (España)',
+  'Lamine Yamal (España)',
+  'Mikel Oyarzabal (España)',
+  'Pedri (España)',
+  'Gavi (España)',
+  'Ferran Torres (España)',
+  'Alejandro Balde (España)',
+  'Rodri (España)',
+  'Íñigo Martínez (España)',
+
+  // INGLATERRA
+  'Harry Kane (Inglaterra)',
+  'Phil Foden (Inglaterra)',
+  'Bukayo Saka (Inglaterra)',
+  'Jude Bellingham (Inglaterra)',
+  'Declan Rice (Inglaterra)',
+  'Mason Mount (Inglaterra)',
+  'Raheem Sterling (Inglaterra)',
+  'Jack Grealish (Inglaterra)',
+  'Jarrod Bowen (Inglaterra)',
+  'James Maddison (Inglaterra)',
+
+  // PORTUGAL
+  'Cristiano Ronaldo (Portugal)',
+  'Gonçalo Ramos (Portugal)',
+  'Rafael Leão (Portugal)',
+  'João Félix (Portugal)',
+  'Bernardo Silva (Portugal)',
+  'Bruno Fernandes (Portugal)',
+  'Diogo Dalot (Portugal)',
+  'Vitinha (Portugal)',
+
+  // BÉLGICA
+  'Kevin De Bruyne (Bélgica)',
+  'Romelu Lukaku (Bélgica)',
+  'Eden Hazard (Bélgica)', // REVISAR - puede estar retirado
+  'Axel Witsel (Bélgica)',
+  'Thibaut Courtois (Bélgica)',
+  'Yannick Carrasco (Bélgica)',
+  'Dedryck Boyata (Bélgica)',
+
+  // PAÍSES BAJOS
+  'Cody Gakpo (Países Bajos)',
+  'Memphis Depay (Países Bajos)',
+  'Steven Bergwijn (Países Bajos)',
+  'Jurriën Timber (Países Bajos)',
+  'Frenkie de Jong (Países Bajos)',
+  'Denzel Dumfries (Países Bajos)',
+  'Lisandro Martínez (Países Bajos)', // Espera, juega para Argentina
+  'Xavi Simons (Países Bajos)',
+
+  // URUGUAY
+  'Darwin Núñez (Uruguay)',
+  'Giorgian de Arrascaeta (Uruguay)',
+  'Federico Valverde (Uruguay)',
+  'Rodrigo Bentancur (Uruguay)',
+  'Sebastián Coates (Uruguay)',
+  'Matías Viña (Uruguay)',
+
+  // MÉXICO
+  'Santiago Giménez (México)',
+  'Hirving Lozano (México)',
+  'Carlos Vela (México)',
+  'Orbelín Pineda (México)',
+  'Raúl Jiménez (México)',
+  'Jesús Angulo (México)',
+  'Edson Álvarez (México)',
+
+  // COLOMBIA
+  'Luis Díaz (Colombia)',
+  'Juan Fernando Quintero (Colombia)',
+  'James Rodríguez (Colombia)',
+  'Duván Zapata (Colombia)',
+  'Juan Guillermo Cuadrado (Colombia)',
+  'Rafael Santos Borré (Colombia)',
+
+  // ECUADOR
+  'Moisés Caicedo (Ecuador)',
+  'Piero Hincapié (Ecuador)',
+  'Enner Valencia (Ecuador)',
+  'Pacho Hincapié (Ecuador)',
+
+  // PARAGUAY
+  'Óscar Romero (Paraguay)',
+  'Gustavo Gómez (Paraguay)',
+  'Néstor Giménez (Paraguay)',
+
+  // ESTADOS UNIDOS
+  'Christian Pulisic (EE.UU.)',
+  'Sergiño Dest (EE.UU.)',
+  'Gio Reyna (EE.UU.)',
+  'Joe Scally (EE.UU.)',
+  'Antonee Robinson (EE.UU.)',
+  'Yunus Musah (EE.UU.)',
+  'Kellyn Acosta (EE.UU.)',
+
+  // CANADÁ
+  'Jonathan David (Canadá)',
+  'Alphonso Davies (Canadá)',
+  'Mike Petrasso (Canadá)',
+  'Cyle Larin (Canadá)',
+  'Ayo Akinola (Canadá)',
+
+  // SUECIA
+  'Alexander Isak (Suecia)',
+  'Viktor Gyökeres (Suecia)',
+  'Emil Forsberg (Suecia)',
+  'Dejan Kulusevski (Suecia)',
+
+  // NORUEGA
+  'Erling Haaland (Noruega)',
+  'Martin Ødegaard (Noruega)',
+
+  // DINAMARCA
+  'Christian Eriksen (Dinamarca)',
+  'Rasmus Højlund (Dinamarca)',
+  'Kasper Schmeichel (Dinamarca)',
+
+  // REPÚBLICA CHECA
+  'Tomáš Souček (República Checa)',
+  'Vladimír Darida (República Checa)',
+  'Lukáš Masopust (República Checa)',
+
+  // SUIZA
+  'Xherdan Shaqiri (Suiza)',
+  'Granit Xhaka (Suiza)',
+  'Yann Sommer (Suiza)',
+  'Breel Embolo (Suiza)',
+
+  // AUSTRIA
+  'David Alaba (Austria)',
+  'Christoph Baumgartner (Austria)',
+  'Marcel Sabitzer (Austria)',
+
+  // JAPÓN
+  'Kaoru Mitoma (Japón)',
+  'Takumi Minamino (Japón)',
+  'Hiroki Ito (Japón)',
+  'Reo Hatate (Japón)',
+
+  // COREA DEL SUR
+  'Son Heung-min (Corea del Sur)',
+  'Lee Kang-in (Corea del Sur)',
+  'Kim Min-jae (Corea del Sur)',
+  'Hwang In-beom (Corea del Sur)',
+
+  // AUSTRALIA
+  'Harry Souttar (Australia)',
+  'Mitch Duke (Australia)',
+  'Craig Goodwin (Australia)',
+  'Ajdin Hrustić (Australia)',
+
+  // SENEGAL
+  'Sadio Mané (Senegal)',
+  'Ismaïla Sarr (Senegal)',
+  'Cheikhou Kouyaté (Senegal)',
+  'Fodé Balogun (Senegal)',
+
+  // MARRUECOS
+  'Sofyan Amrabat (Marruecos)',
+  'Noussair Mazraoui (Marruecos)',
+  'Hakim Ziyech (Marruecos)',
+  'Youssef En-Nesyri (Marruecos)',
+  'Achraf Hakimi (Marruecos)',
+
+  // TÚNEZ
+  'Youssef Msakni (Túnez)',
+  'Aïssa Laidouni (Túnez)',
+  'Seif Eddine Khaoui (Túnez)',
+
+  // NIGERIA
+  'Victor Osimhen (Nigeria)',
+  'Ahmed Musa (Nigeria)',
+  'Wilfred Ndidi (Nigeria)',
+  'Samuel Chukwueze (Nigeria)',
+
+  // CAMERÚN
+  'Vincent Aboubakar (Camerún)',
+  'André Onana (Camerún)',
+  'Yannick Bolasie (Camerún)',
+
+  // IRÁN
+  'Mehdi Taremi (Irán)',
+  'Alireza Jahanbakhsh (Irán)',
+  'Saman Ghoddos (Irán)',
+
+  // EGIPTO
+  'Mohamed Salah (Egipto)',
+  'Mohamed Elneny (Egipto)',
+  'Ahmed Hegazi (Egipto)',
+
+  // COSTA DE MARFIL
+  'Nicolas Pépé (Costa de Marfil)',
+  'Wilfried Zaha (Costa de Marfil)',
+
+  // TURQUÍA
+  'Arda Güler (Turquía)',
+  'Kerem Aktürkoğlu (Turquía)',
+  'Merih Demiral (Turquía)',
+  'Serdar Aziz (Turquía)',
+
+  // UZBEKISTÁN
+  'Daler Kuzyaev (Uzbekistán)',
+  'Oston Urunov (Uzbekistán)',
+
+  // IRAK
+  'Amjed Rezzek (Irak)',
+  'Ali Adnan (Irak)',
+
+  // JORDANIA
+  'Yazan Al-Naimat (Jordania)',
+  'Amin Al-Dabbas (Jordania)',
+
+  // ARABIA SAUDITA
+  'Salem Al-Dawsari (Arabia Saudita)',
+  'Ali Al-Bulayhi (Arabia Saudita)',
+
+  // EMIRATOS ÁRABES
+  'Ali Mabkhout (Emiratos Árabes)',
+  'Harib Al-Maafkali (Emiratos Árabes)',
+
+  // QATAR
+  'Almoez Ali (Qatar)',
+  'Akram Afif (Qatar)',
+
+  // NUEVA ZELANDA
+  'Chris Wood (Nueva Zelanda)',
+  'Rory Fallon (Nueva Zelanda)',
+
+  // CURAZAO
+  'Juninho Bacuna (Curazao)',
+  'Chadli Leggett (Curazao)',
+
+  // CABO VERDE
+  'Yan Couto (Cabo Verde)',
+  'Romeesh Ivey (Cabo Verde)',
+
+  // HAITÍ
+  'Jhon Duran (Haití)',
+  'Garry Guerrier (Haití)',
   'Otro'
 ];
 
@@ -130,7 +381,7 @@ const STEPS = [
     id: 'champions',
     title: 'Los 7 países que saben cuánto pesa',
     desc: 'Elegí el último partido que juega cada uno de los 7 campeones mundiales.',
-    scoring: 'Por cada país sumás 500 puntos si acertás que el último partido es fase de grupos. Sumás 300 puntos si acertás que el último partido es 16avos, Octavos, Cuartos, 3ª y 4ª puesto o Final. Sumás 0 si te equivocas.',
+    scoring: 'Por cada país sumás 500 puntos si acertás que el último partido es fase de grupos. Sumás 300 puntos si acertás que el último partido es Dieciseisavos, Octavos, Cuartos, 3ª y 4ª puesto o Final. Sumás 0 si te equivocas.',
     examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> Italia en octavos de final<br><span class="example-result">Si sale</span> Italia se vuelve en octavos, <span class="example-pts">sumás 300</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Italia en fase de grupos<br><span class="example-result">Si sale</span> Italia se vuelve en fase de grupos, <span class="example-pts">sumás 500</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Italia en octavos de final<br><span class="example-result">Si sale</span> Italia llega más lejos que octavos, <span class="example-pts">sumás 0</span></div>',
     type: 'champions'
   },
@@ -138,7 +389,7 @@ const STEPS = [
     id: 'non_champions',
     title: 'Los 41 restantes',
     desc: 'Elegí 3 países no campeones y acertá en qué ronda se vuelven.',
-    scoring: 'Por cada país sumás 100 puntos si acertás que el último partido es fase en grupos, 150 si acertás dieciseisavos, 300 si acertás octavos, 400 si acertás cuartos, 450 si acertás tercer y cuarto puesto, 500 si acertás la final.',
+    scoring: 'Por cada país sumás 100 puntos si acertás que el último partido es fase en grupos, 200 si acertás dieciseisavos, 300 si acertás octavos, 400 si acertás cuartos, 500 si acertás tercer y cuarto puesto, 600 si acertás la final.',
     examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> Camerún en octavos de final<br><span class="example-result">Si</span> Camerún se vuelve en octavos, <span class="example-pts">sumás 300</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Nigeria en grupos<br><span class="example-result">Si</span> Nigeria se vuelve en grupos, <span class="example-pts">sumás 100</span></div><div class="example"><span class="example-pred">Vos pusiste:</span> Chile en cuartos de final<br><span class="example-result">Si</span> Chile llega a la final, <span class="example-pts">sumás 0</span></div>',
     type: 'non_champions'
   },
@@ -162,8 +413,8 @@ const STEPS = [
     id: 'final',
     title: 'Final y campeón',
     desc: "Elegí los dos finalistas, el resultado y el campeón.",
-    scoring: 'Sumás 500 puntos por cada finalista acertado. Sumás 300 si acertás el resultado. Sumás 2500 si acertás el campeón. Es indistinto poner 2 a 0 o 0 a 2.',
-    examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> Italia vs Nigeria, 2 a 1, campeón Italia<br><span class="example-result">Si sale</span> Italia y Nigeria en la final, <span class="example-pts">sumás 500 cada uno (1000)</span></div><div class="example"><span class="example-result">Si sale</span> 2 a 1 el resultado, <span class="example-pts">sumás 300</span></div><div class="example"><span class="example-result">Si sale</span> Italia campeón, <span class="example-pts">sumás 2500</span></div>',
+    scoring: 'Sumás 500 puntos por cada finalista acertado. Sumás 500 si acertás el resultado. Sumás 2500 si acertás el campeón. Es indistinto poner 2 a 0 o 0 a 2.',
+    examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> Italia vs Nigeria, 2 a 1, campeón Italia<br><span class="example-result">Si sale</span> Italia y Nigeria en la final, <span class="example-pts">sumás 500 cada uno (1000)</span></div><div class="example"><span class="example-result">Si sale</span> 2 a 1 el resultado, <span class="example-pts">sumás 500</span></div><div class="example"><span class="example-result">Si sale</span> Italia campeón, <span class="example-pts">sumás 2500</span></div>',
     type: 'final'
   },
   {

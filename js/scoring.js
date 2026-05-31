@@ -19,12 +19,12 @@ const PUNTOS = {
 
   // ----- NO CAMPEONES (3 equipos) -----
   no_campeon_grupos: 100,
-  no_campeon_dieciseisavos: 150,
+  no_campeon_dieciseisavos: 200,
   no_campeon_octavos: 300,
   no_campeon_cuartos: 400,
-  no_campeon_tercero: 400,
+  no_campeon_tercero: 500,
   no_campeon_semis: 500,
-  no_campeon_final: 500,
+  no_campeon_final: 600,
 
   // ----- CAMINO DE ARGENTINA -----
   argentina_por_acierto: 300, // Por cada rival acertado (solo si toda la cadena anterior es correcta)
@@ -36,7 +36,7 @@ const PUNTOS = {
   // ----- FINAL -----
   final_equipo_finalista: 500,   // Por equipo que acertó que juega la final
   final_campeon: 2500,          // Acertó al campeón
-  final_resultado: 300,         // Acertó el resultado exacto
+  final_resultado: 500,         // Acertó el resultado exacto
 
   // ----- GOLEADOR -----
   goleador_jugador: 400,        // Acertó al jugador

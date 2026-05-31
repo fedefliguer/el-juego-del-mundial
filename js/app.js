@@ -243,7 +243,7 @@ function fillStepRandom() {
     for (let i = 0; i < 3; i++) state.answers.nonChamps[i] = { team: nt[Math.floor(Math.random() * nt.length)], stage: fase[Math.floor(Math.random() * fase.length)] };
   } else if (type === 'argentina') {
     state.answers.argentina = { grupo: String(Math.floor(Math.random() * 4) + 1), rivales: {}, plantarse: null };
-    const na = TEAMS.filter(t => t !== 'Argentina');
+  const na = TEAMS.filter(t => t !== 'Argentina').sort();
     ['dieciseisavos','octavos','cuartos','semis','final'].forEach(s => state.answers.argentina.rivales[s] = na[Math.floor(Math.random() * na.length)]);
   } else if (type === 'primera_vez') {
     state.answers.dobleCamiseta = { team: DEBUTANTS[Math.floor(Math.random() * DEBUTANTS.length)], mode: Math.random() > 0.5 ? 'solo' : 'compartido' };
@@ -358,7 +358,7 @@ function renderGroups() {
 /* --- CHAMPIONS --- */
 const STAGE_PILLS = [
   { value: 'grupos',        label: 'Grupos'   },
-  { value: 'dieciseisavos', label: '16avos'   },
+  { value: 'dieciseisavos', label: 'Dieciseisavos'   },
   { value: 'octavos',       label: 'Octavos'  },
   { value: 'cuartos',       label: 'Cuartos'  },
   { value: 'tercero',       label: '3° y 4° Puesto'},
@@ -399,7 +399,7 @@ function renderNonChampions() {
       </div>`;
     } else {
       const selectedTeams = saved.filter((n, j) => j !== i && n.team).map(n => n.team);
-      const available = nt.filter(t => !selectedTeams.includes(t));
+      const available = nt.filter(t => !selectedTeams.includes(t)).sort();
       html += `<div class="champ-row">
         ${renderSelect(available, s.team, `nonChamps.${i}.team`, `Equipo #${i+1}`)}
       </div>`;
@@ -482,12 +482,12 @@ function renderFinal() {
     <div class="finalists-row">
       <div class="form-group" style="margin:0;flex:1">
         <label>Finalista A</label>
-        ${renderSelect(TEAMS, f.team1, 'final.team1')}
+        ${renderSelect([...TEAMS].sort(), f.team1, 'final.team1')}
       </div>
       <div class="vs-badge">vs</div>
       <div class="form-group" style="margin:0;flex:1">
         <label>Finalista B</label>
-        ${renderSelect(TEAMS, f.team2, 'final.team2')}
+        ${renderSelect([...TEAMS].sort(), f.team2, 'final.team2')}
       </div>
     </div>
 
