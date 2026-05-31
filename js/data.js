@@ -61,294 +61,207 @@ const STAGES = [
 
 // ---------- JUGADORES (Goleador) ----------
 const PLAYERS = [
-  // ARGENTINA
-  'Lionel Messi (Argentina)',
-  'Lautaro Martínez (Argentina)',
-  'Julián Álvarez (Argentina)',
-  'Nico González (Argentina)',
-  'Nicolás Tagliafico (Argentina)',
-  'Giovani Lo Celso (Argentina)',
-  'Gonzalo Montiel (Argentina)',
-  'Alejandro Garnacho (Argentina)', // REVISAR - probablemente no
-  'Paulo Dybala (Argentina)',
-
-  // BRASIL
-  'Vinicius Jr (Brasil)',
-  'Rodrygo (Brasil)',
-  'Endrick (Brasil)',
-  'Neymar (Brasil)',
-  'Lucas Paquetá (Brasil)',
-  'Richarlison (Brasil)',
-  'Gabriel Martinelli (Brasil)',
-  'Antony (Brasil)',
-  'Vinícius Júnior (Brasil)',
-  'Joelinton (Brasil)',
-  'Douglas Luiz (Brasil)',
-
-  // FRANCIA
-  'Kylian Mbappé (Francia)',
-  'Antoine Griezmann (Francia)',
-  'Ousmane Dembélé (Francia)',
-  'Aurélien Tchouaméni (Francia)',
-  'Eduardo Camavinga (Francia)',
-  'Dayot Upamecano (Francia)',
-  'Jules Koundé (Francia)',
-  'N\'Golo Kanté (Francia)',
-  'Theo Hernández (Francia)',
-
-  // ALEMANIA
-  'Jamal Musiala (Alemania)',
-  'Florian Wirtz (Alemania)',
-  'Leroy Sané (Alemania)',
-  'Kai Havertz (Alemania)',
-  'Serge Gnabry (Alemania)',
-  'Thomas Müller (Alemania)',
-  'Manuel Neuer (Alemania)',
-  'Antonio Rüdiger (Alemania)',
-  'Joshua Kimmich (Alemania)',
-
-  // ESPAÑA
-  'Álvaro Morata (España)',
-  'Lamine Yamal (España)',
-  'Mikel Oyarzabal (España)',
-  'Pedri (España)',
-  'Gavi (España)',
-  'Ferran Torres (España)',
-  'Alejandro Balde (España)',
-  'Rodri (España)',
-  'Íñigo Martínez (España)',
-
-  // INGLATERRA
-  'Harry Kane (Inglaterra)',
-  'Phil Foden (Inglaterra)',
-  'Bukayo Saka (Inglaterra)',
-  'Jude Bellingham (Inglaterra)',
-  'Declan Rice (Inglaterra)',
-  'Mason Mount (Inglaterra)',
-  'Raheem Sterling (Inglaterra)',
-  'Jack Grealish (Inglaterra)',
-  'Jarrod Bowen (Inglaterra)',
-  'James Maddison (Inglaterra)',
-
-  // PORTUGAL
-  'Cristiano Ronaldo (Portugal)',
-  'Gonçalo Ramos (Portugal)',
-  'Rafael Leão (Portugal)',
-  'João Félix (Portugal)',
-  'Bernardo Silva (Portugal)',
-  'Bruno Fernandes (Portugal)',
-  'Diogo Dalot (Portugal)',
-  'Vitinha (Portugal)',
-
-  // BÉLGICA
-  'Kevin De Bruyne (Bélgica)',
-  'Romelu Lukaku (Bélgica)',
-  'Eden Hazard (Bélgica)', // REVISAR - puede estar retirado
-  'Axel Witsel (Bélgica)',
-  'Thibaut Courtois (Bélgica)',
-  'Yannick Carrasco (Bélgica)',
-  'Dedryck Boyata (Bélgica)',
-
-  // PAÍSES BAJOS
-  'Cody Gakpo (Países Bajos)',
-  'Memphis Depay (Países Bajos)',
-  'Steven Bergwijn (Países Bajos)',
-  'Jurriën Timber (Países Bajos)',
-  'Frenkie de Jong (Países Bajos)',
-  'Denzel Dumfries (Países Bajos)',
-  'Lisandro Martínez (Países Bajos)', // Espera, juega para Argentina
-  'Xavi Simons (Países Bajos)',
-
-  // URUGUAY
-  'Darwin Núñez (Uruguay)',
-  'Giorgian de Arrascaeta (Uruguay)',
-  'Federico Valverde (Uruguay)',
-  'Rodrigo Bentancur (Uruguay)',
-  'Sebastián Coates (Uruguay)',
-  'Matías Viña (Uruguay)',
-
-  // MÉXICO
-  'Santiago Giménez (México)',
-  'Hirving Lozano (México)',
-  'Carlos Vela (México)',
-  'Orbelín Pineda (México)',
-  'Raúl Jiménez (México)',
-  'Jesús Angulo (México)',
-  'Edson Álvarez (México)',
-
-  // COLOMBIA
-  'Luis Díaz (Colombia)',
-  'Juan Fernando Quintero (Colombia)',
-  'James Rodríguez (Colombia)',
-  'Duván Zapata (Colombia)',
-  'Juan Guillermo Cuadrado (Colombia)',
-  'Rafael Santos Borré (Colombia)',
-
-  // ECUADOR
-  'Moisés Caicedo (Ecuador)',
-  'Piero Hincapié (Ecuador)',
-  'Enner Valencia (Ecuador)',
-  'Pacho Hincapié (Ecuador)',
-
-  // PARAGUAY
-  'Óscar Romero (Paraguay)',
-  'Gustavo Gómez (Paraguay)',
-  'Néstor Giménez (Paraguay)',
-
-  // ESTADOS UNIDOS
-  'Christian Pulisic (EE.UU.)',
-  'Sergiño Dest (EE.UU.)',
-  'Gio Reyna (EE.UU.)',
-  'Joe Scally (EE.UU.)',
-  'Antonee Robinson (EE.UU.)',
-  'Yunus Musah (EE.UU.)',
-  'Kellyn Acosta (EE.UU.)',
-
-  // CANADÁ
-  'Jonathan David (Canadá)',
-  'Alphonso Davies (Canadá)',
-  'Mike Petrasso (Canadá)',
-  'Cyle Larin (Canadá)',
-  'Ayo Akinola (Canadá)',
-
-  // SUECIA
-  'Alexander Isak (Suecia)',
-  'Viktor Gyökeres (Suecia)',
-  'Emil Forsberg (Suecia)',
-  'Dejan Kulusevski (Suecia)',
-
-  // NORUEGA
-  'Erling Haaland (Noruega)',
-  'Martin Ødegaard (Noruega)',
-
-  // DINAMARCA
-  'Christian Eriksen (Dinamarca)',
-  'Rasmus Højlund (Dinamarca)',
-  'Kasper Schmeichel (Dinamarca)',
-
-  // REPÚBLICA CHECA
-  'Tomáš Souček (República Checa)',
-  'Vladimír Darida (República Checa)',
-  'Lukáš Masopust (República Checa)',
-
-  // SUIZA
-  'Xherdan Shaqiri (Suiza)',
-  'Granit Xhaka (Suiza)',
-  'Yann Sommer (Suiza)',
-  'Breel Embolo (Suiza)',
-
-  // AUSTRIA
-  'David Alaba (Austria)',
-  'Christoph Baumgartner (Austria)',
-  'Marcel Sabitzer (Austria)',
-
-  // JAPÓN
-  'Kaoru Mitoma (Japón)',
-  'Takumi Minamino (Japón)',
-  'Hiroki Ito (Japón)',
-  'Reo Hatate (Japón)',
-
-  // COREA DEL SUR
-  'Son Heung-min (Corea del Sur)',
-  'Lee Kang-in (Corea del Sur)',
-  'Kim Min-jae (Corea del Sur)',
-  'Hwang In-beom (Corea del Sur)',
-
-  // AUSTRALIA
-  'Harry Souttar (Australia)',
-  'Mitch Duke (Australia)',
-  'Craig Goodwin (Australia)',
-  'Ajdin Hrustić (Australia)',
-
-  // SENEGAL
-  'Sadio Mané (Senegal)',
-  'Ismaïla Sarr (Senegal)',
-  'Cheikhou Kouyaté (Senegal)',
-  'Fodé Balogun (Senegal)',
-
-  // MARRUECOS
-  'Sofyan Amrabat (Marruecos)',
-  'Noussair Mazraoui (Marruecos)',
-  'Hakim Ziyech (Marruecos)',
-  'Youssef En-Nesyri (Marruecos)',
   'Achraf Hakimi (Marruecos)',
-
-  // TÚNEZ
-  'Youssef Msakni (Túnez)',
-  'Aïssa Laidouni (Túnez)',
-  'Seif Eddine Khaoui (Túnez)',
-
-  // NIGERIA
-  'Victor Osimhen (Nigeria)',
-  'Ahmed Musa (Nigeria)',
-  'Wilfred Ndidi (Nigeria)',
-  'Samuel Chukwueze (Nigeria)',
-
-  // CAMERÚN
-  'Vincent Aboubakar (Camerún)',
-  'André Onana (Camerún)',
-  'Yannick Bolasie (Camerún)',
-
-  // IRÁN
-  'Mehdi Taremi (Irán)',
-  'Alireza Jahanbakhsh (Irán)',
-  'Saman Ghoddos (Irán)',
-
-  // EGIPTO
-  'Mohamed Salah (Egipto)',
-  'Mohamed Elneny (Egipto)',
   'Ahmed Hegazi (Egipto)',
-
-  // COSTA DE MARFIL
-  'Nicolas Pépé (Costa de Marfil)',
-  'Wilfried Zaha (Costa de Marfil)',
-
-  // TURQUÍA
-  'Arda Güler (Turquía)',
-  'Kerem Aktürkoğlu (Turquía)',
-  'Merih Demiral (Turquía)',
-  'Serdar Aziz (Turquía)',
-
-  // UZBEKISTÁN
-  'Daler Kuzyaev (Uzbekistán)',
-  'Oston Urunov (Uzbekistán)',
-
-  // IRAK
-  'Amjed Rezzek (Irak)',
-  'Ali Adnan (Irak)',
-
-  // JORDANIA
-  'Yazan Al-Naimat (Jordania)',
-  'Amin Al-Dabbas (Jordania)',
-
-  // ARABIA SAUDITA
-  'Salem Al-Dawsari (Arabia Saudita)',
-  'Ali Al-Bulayhi (Arabia Saudita)',
-
-  // EMIRATOS ÁRABES
-  'Ali Mabkhout (Emiratos Árabes)',
-  'Harib Al-Maafkali (Emiratos Árabes)',
-
-  // QATAR
-  'Almoez Ali (Qatar)',
+  'Ahmed Musa (Nigeria)',
+  'Aïssa Laidouni (Túnez)',
+  'Ajdin Hrustić (Australia)',
   'Akram Afif (Qatar)',
-
-  // NUEVA ZELANDA
-  'Chris Wood (Nueva Zelanda)',
-  'Rory Fallon (Nueva Zelanda)',
-
-  // CURAZAO
-  'Juninho Bacuna (Curazao)',
+  'Alejandro Balde (España)',
+  'Alejandro Garnacho (Argentina)', // REVISAR - probablemente no
+  'Alexander Isak (Suecia)',
+  'Ali Adnan (Irak)',
+  'Ali Al-Bulayhi (Arabia Saudita)',
+  'Ali Mabkhout (Emiratos Árabes)',
+  'Alireza Jahanbakhsh (Irán)',
+  'Almoez Ali (Qatar)',
+  'Alphonso Davies (Canadá)',
+  'Álvaro Morata (España)',
+  'Amin Al-Dabbas (Jordania)',
+  'Amjed Rezzek (Irak)',
+  'André Onana (Camerún)',
+  'Antoine Griezmann (Francia)',
+  'Antonee Robinson (EE.UU.)',
+  'Antonio Rüdiger (Alemania)',
+  'Antony (Brasil)',
+  'Arda Güler (Turquía)',
+  'Aurélien Tchouaméni (Francia)',
+  'Axel Witsel (Bélgica)',
+  'Ayo Akinola (Canadá)',
+  'Bernardo Silva (Portugal)',
+  'Breel Embolo (Suiza)',
+  'Bruno Fernandes (Portugal)',
+  'Bukayo Saka (Inglaterra)',
+  'Carlos Vela (México)',
   'Chadli Leggett (Curazao)',
-
-  // CABO VERDE
-  'Yan Couto (Cabo Verde)',
-  'Romeesh Ivey (Cabo Verde)',
-
-  // HAITÍ
-  'Jhon Duran (Haití)',
+  'Cheikhou Kouyaté (Senegal)',
+  'Chris Wood (Nueva Zelanda)',
+  'Christian Eriksen (Dinamarca)',
+  'Christian Pulisic (EE.UU.)',
+  'Christoph Baumgartner (Austria)',
+  'Cody Gakpo (Países Bajos)',
+  'Craig Goodwin (Australia)',
+  'Cristiano Ronaldo (Portugal)',
+  'Cyle Larin (Canadá)',
+  'Daler Kuzyaev (Uzbekistán)',
+  'Darwin Núñez (Uruguay)',
+  'David Alaba (Austria)',
+  'Dayot Upamecano (Francia)',
+  'Declan Rice (Inglaterra)',
+  'Dedryck Boyata (Bélgica)',
+  'Dejan Kulusevski (Suecia)',
+  'Denzel Dumfries (Países Bajos)',
+  'Diogo Dalot (Portugal)',
+  'Douglas Luiz (Brasil)',
+  'Duván Zapata (Colombia)',
+  'Eden Hazard (Bélgica)', // REVISAR - puede estar retirado
+  'Edson Álvarez (México)',
+  'Eduardo Camavinga (Francia)',
+  'Emil Forsberg (Suecia)',
+  'Endrick (Brasil)',
+  'Enner Valencia (Ecuador)',
+  'Erling Haaland (Noruega)',
+  'Federico Valverde (Uruguay)',
+  'Ferran Torres (España)',
+  'Florian Wirtz (Alemania)',
+  'Fodé Balogun (Senegal)',
+  'Frenkie de Jong (Países Bajos)',
+  'Gabriel Martinelli (Brasil)',
   'Garry Guerrier (Haití)',
-  'Otro'
+  'Gavi (España)',
+  'Gio Reyna (EE.UU.)',
+  'Giorgian de Arrascaeta (Uruguay)',
+  'Giovani Lo Celso (Argentina)',
+  'Gonçalo Ramos (Portugal)',
+  'Gonzalo Montiel (Argentina)',
+  'Granit Xhaka (Suiza)',
+  'Gustavo Gómez (Paraguay)',
+  'Hakim Ziyech (Marruecos)',
+  'Harib Al-Maafkali (Emiratos Árabes)',
+  'Harry Kane (Inglaterra)',
+  'Harry Souttar (Australia)',
+  'Hiroki Ito (Japón)',
+  'Hirving Lozano (México)',
+  'Hwang In-beom (Corea del Sur)',
+  'Íñigo Martínez (España)',
+  'Ismaïla Sarr (Senegal)',
+  'Jack Grealish (Inglaterra)',
+  'Jamal Musiala (Alemania)',
+  'James Maddison (Inglaterra)',
+  'James Rodríguez (Colombia)',
+  'Jarrod Bowen (Inglaterra)',
+  'Jesús Angulo (México)',
+  'Jhon Duran (Haití)',
+  'João Félix (Portugal)',
+  'Joe Scally (EE.UU.)',
+  'Joelinton (Brasil)',
+  'Jonathan David (Canadá)',
+  'Joshua Kimmich (Alemania)',
+  'Juan Fernando Quintero (Colombia)',
+  'Juan Guillermo Cuadrado (Colombia)',
+  'Jude Bellingham (Inglaterra)',
+  'Jules Koundé (Francia)',
+  'Julián Álvarez (Argentina)',
+  'Juninho Bacuna (Curazao)',
+  'Jurriën Timber (Países Bajos)',
+  'Kai Havertz (Alemania)',
+  'Kaoru Mitoma (Japón)',
+  'Kasper Schmeichel (Dinamarca)',
+  'Kellyn Acosta (EE.UU.)',
+  'Kerem Aktürkoğlu (Turquía)',
+  'Kevin De Bruyne (Bélgica)',
+  'Kim Min-jae (Corea del Sur)',
+  'Kylian Mbappé (Francia)',
+  'Lamine Yamal (España)',
+  'Lautaro Martínez (Argentina)',
+  'Lee Kang-in (Corea del Sur)',
+  'Leroy Sané (Alemania)',
+  'Lionel Messi (Argentina)',
+  'Lisandro Martínez (Países Bajos)', // Espera, juega para Argentina
+  'Lucas Paquetá (Brasil)',
+  'Luis Díaz (Colombia)',
+  'Lukáš Masopust (República Checa)',
+  'Manuel Neuer (Alemania)',
+  'Marcel Sabitzer (Austria)',
+  'Martin Ødegaard (Noruega)',
+  'Mason Mount (Inglaterra)',
+  'Matías Viña (Uruguay)',
+  'Mehdi Taremi (Irán)',
+  'Memphis Depay (Países Bajos)',
+  'Merih Demiral (Turquía)',
+  'Mike Petrasso (Canadá)',
+  'Mikel Oyarzabal (España)',
+  'Mitch Duke (Australia)',
+  'Mohamed Elneny (Egipto)',
+  'Mohamed Salah (Egipto)',
+  'Moisés Caicedo (Ecuador)',
+  'N\'Golo Kanté (Francia)',
+  'Néstor Giménez (Paraguay)',
+  'Neymar (Brasil)',
+  'Nico González (Argentina)',
+  'Nicolas Pépé (Costa de Marfil)',
+  'Nicolás Tagliafico (Argentina)',
+  'Noussair Mazraoui (Marruecos)',
+  'Orbelín Pineda (México)',
+  'Óscar Romero (Paraguay)',
+  'Oston Urunov (Uzbekistán)',
+  'Otro',
+  'Ousmane Dembélé (Francia)',
+  'Pacho Hincapié (Ecuador)',
+  'Paulo Dybala (Argentina)',
+  'Pedri (España)',
+  'Phil Foden (Inglaterra)',
+  'Piero Hincapié (Ecuador)',
+  'Rafael Leão (Portugal)',
+  'Rafael Santos Borré (Colombia)',
+  'Raheem Sterling (Inglaterra)',
+  'Rasmus Højlund (Dinamarca)',
+  'Raúl Jiménez (México)',
+  'Reo Hatate (Japón)',
+  'Richarlison (Brasil)',
+  'Rodri (España)',
+  'Rodrigo Bentancur (Uruguay)',
+  'Rodrygo (Brasil)',
+  'Romeesh Ivey (Cabo Verde)',
+  'Romelu Lukaku (Bélgica)',
+  'Rory Fallon (Nueva Zelanda)',
+  'Sadio Mané (Senegal)',
+  'Salem Al-Dawsari (Arabia Saudita)',
+  'Saman Ghoddos (Irán)',
+  'Samuel Chukwueze (Nigeria)',
+  'Santiago Giménez (México)',
+  'Sebastián Coates (Uruguay)',
+  'Seif Eddine Khaoui (Túnez)',
+  'Serdar Aziz (Turquía)',
+  'Serge Gnabry (Alemania)',
+  'Sergiño Dest (EE.UU.)',
+  'Sofyan Amrabat (Marruecos)',
+  'Son Heung-min (Corea del Sur)',
+  'Steven Bergwijn (Países Bajos)',
+  'Takumi Minamino (Japón)',
+  'Theo Hernández (Francia)',
+  'Thibaut Courtois (Bélgica)',
+  'Thomas Müller (Alemania)',
+  'Tomáš Souček (República Checa)',
+  'Victor Osimhen (Nigeria)',
+  'Viktor Gyökeres (Suecia)',
+  'Vincent Aboubakar (Camerún)',
+  'Vinicius Jr (Brasil)',
+  'Vinícius Júnior (Brasil)',
+  'Vitinha (Portugal)',
+  'Vladimír Darida (República Checa)',
+  'Wilfred Ndidi (Nigeria)',
+  'Wilfried Zaha (Costa de Marfil)',
+  'Xavi Simons (Países Bajos)',
+  'Xherdan Shaqiri (Suiza)',
+  'Yan Couto (Cabo Verde)',
+  'Yann Sommer (Suiza)',
+  'Yannick Bolasie (Camerún)',
+  'Yannick Carrasco (Bélgica)',
+  'Yazan Al-Naimat (Jordania)',
+  'Youssef En-Nesyri (Marruecos)',
+  'Youssef Msakni (Túnez)',
+  'Yunus Musah (EE.UU.)'
 ];
 
 
@@ -413,7 +326,7 @@ const STEPS = [
     id: 'final',
     title: 'Final y campeón',
     desc: "Elegí los dos finalistas, el resultado y el campeón.",
-    scoring: 'Sumás 500 puntos por cada finalista acertado. Sumás 500 si acertás el resultado. Sumás 2500 si acertás el campeón. Es indistinto poner 2 a 0 o 0 a 2.',
+    scoring: 'Sumás 500 puntos por cada finalista acertado. Sumás 500 si acertás el resultado (contando alargue). Sumás 2500 si acertás el campeón. Es indistinto poner 2 a 0 o 0 a 2.',
     examples: '<div class="example"><span class="example-pred">Vos pusiste:</span> Italia vs Nigeria, 2 a 1, campeón Italia<br><span class="example-result">Si sale</span> Italia y Nigeria en la final, <span class="example-pts">sumás 500 cada uno (1000)</span></div><div class="example"><span class="example-result">Si sale</span> 2 a 1 el resultado, <span class="example-pts">sumás 500</span></div><div class="example"><span class="example-result">Si sale</span> Italia campeón, <span class="example-pts">sumás 2500</span></div>',
     type: 'final'
   },

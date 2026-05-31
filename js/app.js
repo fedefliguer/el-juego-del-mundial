@@ -492,7 +492,7 @@ function renderFinal() {
     </div>
 
     <div class="score-row">
-      <div class="score-label" style="grid-column:1/-1;margin-bottom:4px;">Resultado del partido (incluyendo el eventual alargue)</div>
+      <div class="score-label" style="grid-column:1/-1;margin-bottom:4px;">Resultado</div>
       <div class="score-group">
         <div class="score-stepper">
           <button class="stepper-btn" data-action="score-step" data-field="score1" data-dir="dec">−</button>
