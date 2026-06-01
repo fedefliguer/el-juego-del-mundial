@@ -606,7 +606,7 @@ function showNewTagPicker(name) {
   });
 
   // Confirm
-  $('modal-confirm-tag').addEventListener('click', () => {
+  $('modal-confirm-tag').addEventListener('click', async () => {
     const vis = body.querySelector('.vis-opt.active').dataset.vis;
     let code = '';
     if (vis === 'private') {
@@ -614,6 +614,8 @@ function showNewTagPicker(name) {
       if (!code || code.length < 3) { showToast('El código debe tener al menos 3 dígitos.'); return; }
     }
     state.tournamentMeta[name] = { visibility: vis, inviteCode: code };
+    await supabase.upsertTournament(name, vis, code);
+    allTournaments.push({ name, visibility: vis });
     hideCreateModal();
     doAddTag(name);
   });
@@ -621,6 +623,47 @@ function showNewTagPicker(name) {
 
 function hideCreateModal() {
   $('create-tournament-modal').classList.remove('visible');
+}
+
+/* --- Landing create tournament --- */
+function showLandingCreateTournament() {
+  const body = $('create-tournament-body');
+  body.innerHTML = `
+    <p style="margin-bottom:14px;">Ingresá el nombre del torneo:</p>
+    <input type="text" id="landing-tag-input" placeholder="Ej: argentina" maxlength="20" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:1rem;text-align:center;">
+    <button class="btn btn--primary" style="width:100%;margin-top:14px;" id="landing-tag-confirm">Continuar</button>`;
+  $('create-tournament-modal').classList.add('visible');
+
+  $('landing-tag-confirm').addEventListener('click', () => {
+    const v = $('landing-tag-input').value.trim();
+    if (!v) { showToast('Ingresá un nombre.'); return; }
+    handleLandingTag(v);
+  });
+  $('landing-tag-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const v = e.target.value.trim();
+      if (v) handleLandingTag(v);
+    }
+  });
+}
+
+function handleLandingTag(name) {
+  if (!name || state.tags.includes(name) || state.tags.length >= 5) return;
+  const existing = allTournaments.find(t => t.name === name);
+  if (existing) {
+    if (existing.visibility === 'public') {
+      doAddTag(name);
+      hideCreateModal();
+      showToast(`✅ Te uniste al torneo "${name}"`);
+    } else {
+      hideCreateModal();
+      showPrivateTagCodePrompt(name);
+    }
+  } else {
+    hideCreateModal();
+    showNewTagPicker(name);
+  }
 }
 
 /* --- Private tag code prompt (join existing) --- */
@@ -1238,6 +1281,7 @@ document.addEventListener('click', e => {
     return;
   }
   if (t.id === 'btn-start') { showScreen('form'); if (!localStorage.getItem(STORAGE_KEY)) state.step = 0; renderCurrentStep(); }
+  if (t.id === 'btn-create-tournament') { showLandingCreateTournament(); }
   if (t.id === 'btn-next') nextStep();
   if (t.id === 'btn-back' || t.id === 'btn-final-back') prevStep();
   if (t.id === 'btn-submit') handleSubmit();
@@ -1280,6 +1324,7 @@ loadSavedState();
 if (localStorage.getItem(STORAGE_KEY)) {
   setTimeout(() => showToast('↩️ Se restauró tu progreso anterior.'), 600);
 }
+supabase.getTournaments().then(tournaments => { allTournaments = tournaments; });
 
 // Handle ?tag= query param — open results view
 const urlTag = new URLSearchParams(window.location.search).get('tag');
