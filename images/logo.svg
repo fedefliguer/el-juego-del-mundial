@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 48" width="460" height="48">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@800');
+      .t { fill: none; stroke: #F0B429; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+      .f { fill: #F0B429; }
+      .tx { font-family: 'Barlow Condensed', 'Arial Black', Impact, sans-serif; font-weight: 800; font-size: 21px; fill: #F0B429; letter-spacing: 0.5px; }
+    </style>
+  </defs>
+  <!-- Cup bowl -->
+  <path class="t" d="M14,14 L10,32 L30,32 L26,14 Z"/>
+  <!-- Handles -->
+  <path class="t" d="M10,20 C4,20 4,14 10,14"/>
+  <path class="t" d="M30,20 C36,20 36,14 30,14"/>
+  <!-- Stem -->
+  <line class="t" x1="20" y1="32" x2="20" y2="38"/>
+  <!-- Base -->
+  <rect class="t" x="14" y="38" width="12" height="3" rx="1"/>
+  <!-- Star -->
+  <polygon class="f" points="20,16 21.2,19.2 24.6,19.2 21.8,21.4 22.8,24.8 20,22.6 17.2,24.8 18.2,21.4 15.4,19.2 18.8,19.2"/>
+  <!-- Text -->
+  <text class="tx" x="46" y="31">EL JUEGO DEL MUNDIAL 2026</text>
+</svg>
