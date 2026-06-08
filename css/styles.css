@@ -1035,8 +1035,9 @@ select { cursor: pointer; appearance: auto; }
   .step-dot { width: 30px; height: 30px; font-size: 0.75rem; }
   h1 { font-size: 2.2rem; }
   .landing-icon { font-size: 62px; }
-  .nav-link { font-size: 0.8rem; padding: 5px 10px; }
-  .nav-brand { height: 22px; }
+  .nav-link { font-size: 0.8rem; padding: 5px 8px; }
+  .nav-brand { height: 16px; max-width: 50%; }
+  .nav-links { gap: 2px; }
   .ranking-table { font-size: 0.7rem; }
   .ranking-table th, .ranking-table td { padding: 5px 3px; }
   .results-tabs { flex-direction: column; }
