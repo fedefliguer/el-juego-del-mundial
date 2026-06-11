@@ -27,9 +27,6 @@ async function loadRanking() {
     let realResults = null;
     if (resultsLive) {
       realResults = await supabase.getResults();
-      if (!realResults && typeof SIMULATED_RESULTS !== 'undefined') {
-        realResults = SIMULATED_RESULTS;
-      }
     }
 
     rankingData = predictions.map(p => {
