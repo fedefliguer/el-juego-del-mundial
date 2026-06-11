@@ -1083,6 +1083,10 @@ function nextStep() {
     showValidationModal();
     return;
   }
+  if (!submissionsOpen) {
+    showClosedModal();
+    return;
+  }
   showScreen('final');
   renderFinalScreen();
 }
@@ -1105,17 +1109,10 @@ function prevStep() {
 }
 
 function renderClosedLanding() {
-  const hero = document.querySelector('.landing-hero');
-  if (hero) {
-    const banner = document.createElement('div');
-    banner.className = 'closed-banner';
-    banner.innerHTML = '🚫 Inscripciones cerradas — Ya no se pueden registrar predicciones';
-    hero.after(banner);
-  }
   const startBtn = $('btn-start');
   if (startBtn) {
-    startBtn.textContent = 'Inscripciones cerradas';
-    startBtn.disabled = true;
+    startBtn.textContent = '👀 Ver juego';
+    startBtn.disabled = false;
   }
   const createBtn = $('btn-create-tournament');
   if (createBtn) createBtn.style.display = 'none';
@@ -1123,7 +1120,7 @@ function renderClosedLanding() {
 
 function showClosedModal() {
   const body = $('validation-body');
-  body.innerHTML = '<li>🚫 Las inscripciones ya están cerradas. No se pueden registrar nuevas predicciones.</li>';
+  body.innerHTML = '<li>🚫 Las inscripciones están cerradas. Podés revisar los 7 desafíos pero no enviar predicciones.</li>';
   $('validation-modal').classList.add('visible');
 }
 
@@ -1305,7 +1302,7 @@ document.addEventListener('click', e => {
     if (parseInt(t.dataset.clicks) >= 5) { t.dataset.clicks = '0'; showAdminScreen(); }
     return;
   }
-  if (t.id === 'btn-start') { if (!submissionsOpen) { showClosedModal(); return; } showScreen('form'); if (!localStorage.getItem(STORAGE_KEY)) state.step = 0; renderCurrentStep(); }
+  if (t.id === 'btn-start') { showScreen('form'); if (!localStorage.getItem(STORAGE_KEY)) state.step = 0; renderCurrentStep(); }
   if (t.id === 'btn-create-tournament') { showLandingCreateTournament(); }
   if (t.id === 'btn-next') nextStep();
   if (t.id === 'btn-back' || t.id === 'btn-final-back') prevStep();
