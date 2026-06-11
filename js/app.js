@@ -113,6 +113,7 @@ function showScreen(name) {
 
 let toastTimer;
 let nameAvailable = null;
+let submissionsOpen = true;
 function showToast(msg) {
   clearTimeout(toastTimer);
   toast.textContent = msg;
@@ -1103,8 +1104,32 @@ function prevStep() {
   goToStep(state.step - 1);
 }
 
+function renderClosedLanding() {
+  const hero = document.querySelector('.landing-hero');
+  if (hero) {
+    const banner = document.createElement('div');
+    banner.className = 'closed-banner';
+    banner.innerHTML = '🚫 Inscripciones cerradas — Ya no se pueden registrar predicciones';
+    hero.after(banner);
+  }
+  const startBtn = $('btn-start');
+  if (startBtn) {
+    startBtn.textContent = 'Inscripciones cerradas';
+    startBtn.disabled = true;
+  }
+  const createBtn = $('btn-create-tournament');
+  if (createBtn) createBtn.style.display = 'none';
+}
+
+function showClosedModal() {
+  const body = $('validation-body');
+  body.innerHTML = '<li>🚫 Las inscripciones ya están cerradas. No se pueden registrar nuevas predicciones.</li>';
+  $('validation-modal').classList.add('visible');
+}
+
 /* ---------- SUBMIT ---------- */
 async function handleSubmit() {
+  if (!submissionsOpen) { showClosedModal(); return; }
   if (!validateFinal()) return;
   const btn = $('btn-submit');
   btn.disabled = true; btn.classList.add('btn--loading');
@@ -1280,7 +1305,7 @@ document.addEventListener('click', e => {
     if (parseInt(t.dataset.clicks) >= 5) { t.dataset.clicks = '0'; showAdminScreen(); }
     return;
   }
-  if (t.id === 'btn-start') { showScreen('form'); if (!localStorage.getItem(STORAGE_KEY)) state.step = 0; renderCurrentStep(); }
+  if (t.id === 'btn-start') { if (!submissionsOpen) { showClosedModal(); return; } showScreen('form'); if (!localStorage.getItem(STORAGE_KEY)) state.step = 0; renderCurrentStep(); }
   if (t.id === 'btn-create-tournament') { showLandingCreateTournament(); }
   if (t.id === 'btn-next') nextStep();
   if (t.id === 'btn-back' || t.id === 'btn-final-back') prevStep();
@@ -1325,6 +1350,12 @@ if (localStorage.getItem(STORAGE_KEY)) {
   setTimeout(() => showToast('↩️ Se restauró tu progreso anterior.'), 600);
 }
 supabase.getTournaments().then(tournaments => { allTournaments = tournaments; });
+supabase.getConfig().then(cfg => {
+  if (cfg.submissions_open === false) {
+    submissionsOpen = false;
+    renderClosedLanding();
+  }
+});
 
 // Handle ?tag= query param — open results view
 const urlTag = new URLSearchParams(window.location.search).get('tag');

@@ -174,3 +174,7 @@ INSERT INTO schema_version (version, description) VALUES
   (1, 'Schema inicial — predictions, results, RLS'),
   (2, 'check_answers_size, rate_limiting, RLS restrictiva, config, tournaments, logs, admin RPCs')
 ON CONFLICT (version) DO NOTHING;
+
+-- 11. Control de inscripciones (submissions_open = false para cerrar)
+INSERT INTO config (key, value) VALUES ('submissions_open', 'true')
+  ON CONFLICT (key) DO NOTHING;
